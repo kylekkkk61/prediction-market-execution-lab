@@ -102,6 +102,29 @@ The key principle is:
 
 > Preserve legacy code as a reference first, extract public research modules second, and remove private operation files only near public release.
 
+
+## Development Workflow
+
+This project uses `uv` as the canonical environment and command runner.
+
+```bash
+uv sync
+PYTHONPATH=src uv run pytest
+```
+
+Common demo commands:
+
+```bash
+PYTHONPATH=src uv run python scripts/run_tick_replay_backtest.py
+PYTHONPATH=src uv run python scripts/run_execution_quality_report.py
+PYTHONPATH=src uv run python scripts/run_probability_calibration_report.py
+PYTHONPATH=src uv run python scripts/run_monte_carlo_simulation.py
+PYTHONPATH=src uv run python scripts/run_ml_filter_demo.py
+PYTHONPATH=src uv run python scripts/generate_report_figures.py
+```
+
+Dependencies are declared in `pyproject.toml` and locked in `uv.lock`. The legacy `requirements.txt` file is not the primary setup path for this public research project.
+
 ## Disclaimer
 
 This project is for research, educational, and portfolio demonstration purposes only. It is not financial advice, trading advice, or a recommendation to participate in any market.
