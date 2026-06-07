@@ -181,7 +181,7 @@ Goal:
 Current public default:
 
 ```bash
-PYTHONPATH=src .venv/bin/python scripts/prepare_public_sample_data.py
+PYTHONPATH=src uv run python scripts/prepare_public_sample_data.py
 ```
 
 Default limits:
@@ -243,8 +243,8 @@ These scripts should:
 Usage:
 
 ```bash
-PYTHONPATH=src .venv/bin/python scripts/inspect_private_ledger.py
-PYTHONPATH=src .venv/bin/python scripts/inspect_private_ticks.py --max-rows-per-file 1000
+PYTHONPATH=src uv run python scripts/inspect_private_ledger.py
+PYTHONPATH=src uv run python scripts/inspect_private_ticks.py --max-rows-per-file 1000
 ```
 
 ### Sample generation utilities
@@ -266,7 +266,7 @@ This script:
 Usage:
 
 ```bash
-PYTHONPATH=src .venv/bin/python scripts/prepare_public_sample_data.py \
+PYTHONPATH=src uv run python scripts/prepare_public_sample_data.py \
   --max-tick-files 1 \
   --max-tick-rows-per-file 100 \
   --max-ledger-rows-per-file 100
@@ -291,10 +291,10 @@ Before committing generated sample files:
 1. Confirm `private/` is ignored by git.
 2. Confirm `git status` does not show raw private files.
 3. Inspect sample files for sensitive columns.
-4. Run tests using `.venv`:
+4. Run tests using `uv`:
 
 ```bash
-PYTHONPATH=src .venv/bin/python -m pytest
+PYTHONPATH=src uv run pytest
 ```
 
 5. Run relevant demo scripts against `data/sample/`.
