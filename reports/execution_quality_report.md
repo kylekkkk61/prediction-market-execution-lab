@@ -13,10 +13,14 @@
 
 ## Execution funnel
 
+![Signal funnel](figures/signal_funnel.png)
+
 - Accepted rate: **33.50%**
 - Fill rate: **33.50%**
 
 ### Execution status breakdown
+
+![Execution status breakdown](figures/execution_status_breakdown.png)
 
 | Status | Count | Share |
 |---|---:|---:|
@@ -59,6 +63,8 @@ These grouped metrics are calculated on anonymized execution-attempt samples and
 | 30-60 | 47 | 23.40% | 23.40% | 0.2770 | 0.0102 | 2266.0 |
 | 0-30 | 10 | 0.00% | 0.00% | 0.2748 | 0.0100 | 3642.6 |
 
+![Fill rate by edge bucket](figures/fill_rate_by_edge_bucket.png)
+
 ### By signal edge bucket
 
 | Group | Rows | Accepted rate | Fill rate | Avg signal edge | Avg spread | Avg latency ms |
@@ -67,6 +73,8 @@ These grouped metrics are calculated on anonymized execution-attempt samples and
 | <0.25 | 225 | 43.11% | 43.11% | 0.2444 | 0.0104 | 1247.1 |
 | 0.35-0.50 | 135 | 21.48% | 21.48% | 0.4169 | 0.0110 | 1255.4 |
 | >=0.50 | 85 | 20.00% | 20.00% | 0.6181 | 0.0109 | 964.5 |
+
+![Spread distribution](figures/spread_distribution.png)
 
 ### By spread bucket
 

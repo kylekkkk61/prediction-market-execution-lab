@@ -342,10 +342,14 @@ def render_markdown(summary: ExecutionQualitySummary) -> str:
         "",
         "## Execution funnel",
         "",
+        "![Signal funnel](figures/signal_funnel.png)",
+        "",
         f"- Accepted rate: **{metric_to_percent(summary.accepted_rate)}**",
         f"- Fill rate: **{metric_to_percent(summary.fill_rate)}**",
         "",
         "### Execution status breakdown",
+        "",
+        "![Execution status breakdown](figures/execution_status_breakdown.png)",
         "",
         "| Status | Count | Share |",
         "|---|---:|---:|",
@@ -378,8 +382,10 @@ def render_markdown(summary: ExecutionQualitySummary) -> str:
     lines.append("")
     lines.extend(_render_grouped_metrics("By time bucket", summary.time_bucket_metrics))
     lines.append("")
+    lines.extend(["![Fill rate by edge bucket](figures/fill_rate_by_edge_bucket.png)", ""])
     lines.extend(_render_grouped_metrics("By signal edge bucket", summary.edge_bucket_metrics))
     lines.append("")
+    lines.extend(["![Spread distribution](figures/spread_distribution.png)", ""])
     lines.extend(_render_grouped_metrics("By spread bucket", summary.spread_bucket_metrics))
 
     lines.extend([
