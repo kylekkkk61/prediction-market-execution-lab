@@ -7,7 +7,7 @@ This document defines how private raw ledger and tick data should be inspected, 
 The project now has local private raw data that can improve the realism of the public research workflow:
 
 ```text
-private/
+private/raw_data/
 ├── ledger/
 └── tick_snapshots/
 ```
@@ -21,7 +21,7 @@ The public repo should not expose the raw data. Instead, raw files are local-onl
 Location:
 
 ```text
-private/ledger/
+private/raw_data/ledger/
 ```
 
 Expected contents may include:
@@ -47,7 +47,7 @@ The full ledger is useful for:
 Location:
 
 ```text
-private/tick_snapshots/
+private/raw_data/tick_snapshots/
 ```
 
 Current window:
@@ -210,10 +210,17 @@ scripts/inspect_private_ticks.py
 
 These scripts should:
 
-- read from `private/ledger/` and `private/tick_snapshots/`
+- read from `private/raw_data/ledger/` and `private/raw_data/tick_snapshots/`
 - print aggregate summaries only
 - avoid writing public files by default
 - avoid printing sensitive values
+
+Usage:
+
+```bash
+PYTHONPATH=src .venv/bin/python scripts/inspect_private_ledger.py
+PYTHONPATH=src .venv/bin/python scripts/inspect_private_ticks.py --max-rows-per-file 1000
+```
 
 ### Sample generation utilities
 
