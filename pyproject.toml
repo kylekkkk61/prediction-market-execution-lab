@@ -1,0 +1,33 @@
+[project]
+name = "prediction-market-execution-lab"
+version = "0.1.0"
+description = "Research tools for studying executable edge in short-horizon prediction markets."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Kyle" }]
+
+dependencies = [
+  "numpy>=1.26",
+  "pandas>=2.2",
+  "matplotlib>=3.8",
+  "scikit-learn>=1.4",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.5",
+]
+notebooks = [
+  "jupyter>=1.0",
+]
+dashboard = [
+  "streamlit>=1.36",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

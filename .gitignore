@@ -1,73 +1,59 @@
-# ==========================================
-# 系統與編輯器暫存檔 (所有專案皆適用)
-# ==========================================
+# System files
 .DS_Store
 Thumbs.db
 Desktop.ini
-*.swp
-*.log
+
+# Editors
 .vscode/
 .idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
+*.swp
+*.swo
 
-# ==========================================
-# 機密隱私資訊 (絕對不能上傳)
-# ==========================================
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment and secrets
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
 *.pem
 *.key
 id_rsa
+id_ed25519
 
-# ==========================================
-# Node.js / 前端專案 (React, Vue, Next.js等)
-# ==========================================
-node_modules/
-/dist/
-/build/
-.next/
-.nuxt/
-.out/
-.pnpm-store/
-
-# ==========================================
-# Python 專案
-# ==========================================
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
-.venv/
-pip-log.txt
-.pytest_cache/
-
-# ==========================================
-# 測試與覆蓋率報告
-# ==========================================
-coverage/
-.nyc_output/
-htmlcov/
-
-# ==========================================
-# 其它常見編譯輸出
-# ==========================================
-out/
-bin/
-obj/
-sed/
-
-# ==========================================
-# 分析用資料與日誌 (視專案需求調整)
-# ==========================================
+# Local data and generated artifacts
 analysis/
+outputs/
+logs/
+*.log
+*.sqlite
+*.db
 
-#codegraph
+# Keep public sample data intentional; ignore raw private data by default
+data/raw/
+data/private/
+data/live/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Tooling
 .codegraph/
 .cursor/
