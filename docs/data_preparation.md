@@ -173,9 +173,34 @@ Output:
 
 Goal:
 
-- generate small CSV samples in `data/sample/`
-- preserve enough structure for demos and tests
+- generate CSV samples in `data/sample/` from the full private ledger and seven days of tick snapshots
+- preserve enough structure for tick replay, execution-quality reporting, and notebook demos
 - remove or transform sensitive fields
+- keep samples small enough for GitHub review and deterministic test runs
+
+Current public default:
+
+```bash
+PYTHONPATH=src .venv/bin/python scripts/prepare_public_sample_data.py
+```
+
+Default limits:
+
+```text
+--max-tick-files 7
+--max-tick-rows-per-file 1500
+--max-ledger-rows-per-file 1000
+```
+
+Expected public outputs:
+
+```text
+data/sample/candidates_sample.csv
+data/sample/executions_sample.csv
+data/sample/rejections_sample.csv
+data/sample/settlements_sample.csv
+data/sample/tick_snapshots_sample.csv
+```
 
 Output:
 

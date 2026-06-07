@@ -6,31 +6,32 @@
 
 | Dataset | Rows |
 |---|---:|
-| Candidate signals | 100 |
-| Execution attempts | 100 |
-| Signal rejections | 100 |
-| Market settlements | 100 |
+| Candidate signals | 268 |
+| Execution attempts | 1000 |
+| Signal rejections | 1000 |
+| Market settlements | 1000 |
 
 ## Execution funnel
 
-- Accepted rate: **31.00%**
-- Fill rate: **31.00%**
+- Accepted rate: **33.50%**
+- Fill rate: **33.50%**
 
 ### Execution status breakdown
 
 | Status | Count | Share |
 |---|---:|---:|
-| blocked_exposure | 33 | 33.00% |
-| live_failed | 32 | 32.00% |
-| live_success | 31 | 31.00% |
-| blocked_order_cooldown | 4 | 4.00% |
+| live_success | 335 | 33.50% |
+| live_failed | 325 | 32.50% |
+| blocked_exposure | 288 | 28.80% |
+| blocked_order_cooldown | 35 | 3.50% |
+| blocked_ml_filter | 17 | 1.70% |
 
 ## Rejection reason breakdown
 
 | Reason | Count | Share |
 |---|---:|---:|
-| other | 83 | 83.00% |
-| risk_limit | 17 | 17.00% |
+| other | 643 | 64.30% |
+| risk_limit | 357 | 35.70% |
 
 ## Edge decay
 
@@ -45,26 +46,26 @@
 
 | Time bucket | Count | Share |
 |---|---:|---:|
-| 270-300 | 22 | 22.00% |
-| 150-180 | 17 | 17.00% |
-| 240-270 | 16 | 16.00% |
-| 120-150 | 9 | 9.00% |
-| 210-240 | 9 | 9.00% |
-| 180-210 | 8 | 8.00% |
-| 90-120 | 8 | 8.00% |
-| 60-90 | 5 | 5.00% |
-| 30-60 | 5 | 5.00% |
-| 0-30 | 1 | 1.00% |
+| 180-210 | 55 | 20.52% |
+| 210-240 | 41 | 15.30% |
+| 240-270 | 39 | 14.55% |
+| 270-300 | 34 | 12.69% |
+| 150-180 | 32 | 11.94% |
+| 120-150 | 21 | 7.84% |
+| 60-90 | 18 | 6.72% |
+| 90-120 | 17 | 6.34% |
+| 30-60 | 9 | 3.36% |
+| 0-30 | 2 | 0.75% |
 
 ## Settlement PnL summary
 
 | Metric | Value |
 |---|---:|
-| Rows with normalized PnL | 100 |
-| Average normalized net PnL | 0.0029 |
-| Minimum normalized net PnL | -0.0938 |
-| Maximum normalized net PnL | 0.2664 |
-| Positive normalized PnL rate | 39.00% |
+| Rows with normalized PnL | 1000 |
+| Average normalized net PnL | -0.0001 |
+| Minimum normalized net PnL | -0.0942 |
+| Maximum normalized net PnL | 0.7876 |
+| Positive normalized PnL rate | 37.70% |
 
 ## Interpretation note
 
