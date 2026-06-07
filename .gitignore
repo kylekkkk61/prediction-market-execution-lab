@@ -21,9 +21,14 @@ env/
 *.key
 *.pem
 
-# Local data and private outputs
+# Private/raw research inputs - never commit
+private/
 data/private/
 data/raw/
+*.jsonl.gz
+*.csv.gz
+
+# Local data and private outputs
 logs/
 outputs/
 *.log
