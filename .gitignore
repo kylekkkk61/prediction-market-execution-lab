@@ -1,73 +1,42 @@
-# ==========================================
-# 系統與編輯器暫存檔 (所有專案皆適用)
-# ==========================================
-.DS_Store
-Thumbs.db
-Desktop.ini
-*.swp
-*.log
-.vscode/
-.idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-
-# ==========================================
-# 機密隱私資訊 (絕對不能上傳)
-# ==========================================
-.env
-.env.local
-.env.*.local
-*.pem
-*.key
-id_rsa
-
-# ==========================================
-# Node.js / 前端專案 (React, Vue, Next.js等)
-# ==========================================
-node_modules/
-/dist/
-/build/
-.next/
-.nuxt/
-.out/
-.pnpm-store/
-
-# ==========================================
-# Python 專案
-# ==========================================
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
 *.pyd
-.Python
-env/
-venv/
-.venv/
-pip-log.txt
 .pytest_cache/
-
-# ==========================================
-# 測試與覆蓋率報告
-# ==========================================
-coverage/
-.nyc_output/
+.mypy_cache/
+.ruff_cache/
+.coverage
 htmlcov/
 
-# ==========================================
-# 其它常見編譯輸出
-# ==========================================
-out/
-bin/
-obj/
-sed/
+# Virtual environments
+.venv/
+venv/
+env/
 
-# ==========================================
-# 分析用資料與日誌 (視專案需求調整)
-# ==========================================
-analysis/
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.key
+*.pem
 
-#codegraph
-.codegraph/
-.cursor/
+# Local data and private outputs
+data/private/
+data/raw/
+logs/
+outputs/
+*.log
+
+# Notebooks
+.ipynb_checkpoints/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
