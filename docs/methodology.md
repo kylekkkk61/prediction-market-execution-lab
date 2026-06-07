@@ -66,6 +66,18 @@ Machine learning may be used as an optional signal-quality diagnostic layer.
 
 The public project will avoid treating ML as a black-box alpha engine. Any ML component should include validation notes and overfitting limitations.
 
+The current public implementation uses anonymized sample execution records to demonstrate the validation workflow:
+
+```text
+public sample executions
+→ numeric feature extraction
+→ chronological train/test split
+→ transparent baseline filter
+→ pass/reject diagnostics
+```
+
+This demo is not evidence of production predictive performance or trading profitability. Its purpose is to show how signal filtering should be structured, validated, and documented without leaking private strategy details.
+
 ## 8. Risk Simulation
 
 Monte Carlo and bootstrap-style simulations may be used to estimate drawdown, losing streaks, and sensitivity to execution assumptions.
