@@ -123,7 +123,7 @@ PYTHONPATH=src uv run python scripts/run_ml_filter_demo.py
 PYTHONPATH=src uv run python scripts/generate_report_figures.py
 ```
 
-Dependencies are declared in `pyproject.toml` and locked in `uv.lock`. The legacy `requirements.txt` file is not the primary setup path for this public research project.
+Dependencies are declared in `pyproject.toml` and locked in `uv.lock`. This project intentionally does not maintain a `requirements.txt` workflow; legacy live-operation dependencies are excluded unless they are needed by a demo-safe research module.
 
 ## Disclaimer
 
