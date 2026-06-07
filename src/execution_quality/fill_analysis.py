@@ -11,7 +11,7 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 from statistics import mean
-from typing import Iterable
+from typing import Callable, Iterable
 
 
 @dataclass(frozen=True)
@@ -34,6 +34,19 @@ class EdgeDecayMetric:
 
 
 @dataclass(frozen=True)
+class GroupedExecutionMetric:
+    """Execution-quality metrics grouped by a categorical bucket."""
+
+    label: str
+    rows: int
+    accepted_rate: float | None
+    fill_rate: float | None
+    avg_signal_edge: float | None
+    avg_signal_spread: float | None
+    avg_latency_ms: float | None
+
+
+@dataclass(frozen=True)
 class ExecutionQualitySummary:
     """Aggregated execution-quality metrics for sample data."""
 
@@ -48,6 +61,10 @@ class ExecutionQualitySummary:
     edge_decay: EdgeDecayMetric
     pnl_summary: dict[str, float | int | None]
     time_bucket_counts: list[CountMetric]
+    side_metrics: list[GroupedExecutionMetric]
+    time_bucket_metrics: list[GroupedExecutionMetric]
+    edge_bucket_metrics: list[GroupedExecutionMetric]
+    spread_bucket_metrics: list[GroupedExecutionMetric]
 
 
 def read_csv_rows(path: Path) -> list[dict[str, str]]:
@@ -82,6 +99,79 @@ def _count_metrics(counter: Counter[str], total: int, limit: int | None = None) 
         CountMetric(label=label, count=count, pct_of_total=count / total)
         for label, count in items
     ]
+
+
+def _mean_or_none(values: Iterable[float]) -> float | None:
+    values_list = list(values)
+    return mean(values_list) if values_list else None
+
+
+def _bucket_edge(row: dict[str, str]) -> str:
+    value = _safe_float(row.get("signal_edge"))
+    if value is None:
+        return "unknown"
+    if value < 0.25:
+        return "<0.25"
+    if value < 0.35:
+        return "0.25-0.35"
+    if value < 0.50:
+        return "0.35-0.50"
+    return ">=0.50"
+
+
+def _bucket_spread(row: dict[str, str]) -> str:
+    value = _safe_float(row.get("signal_spread"))
+    if value is None:
+        return "unknown"
+    if value <= 0.01:
+        return "<=0.01"
+    if value <= 0.02:
+        return "0.01-0.02"
+    return ">0.02"
+
+
+def _execution_group_metrics(
+    execution_rows: Iterable[dict[str, str]],
+    labeler: Callable[[dict[str, str]], str],
+    *,
+    limit: int | None = None,
+) -> list[GroupedExecutionMetric]:
+    groups: dict[str, list[dict[str, str]]] = defaultdict(list)
+    for row in execution_rows:
+        label = labeler(row) or "unknown"
+        groups[label].append(row)
+
+    sorted_groups = sorted(groups.items(), key=lambda item: (-len(item[1]), item[0]))
+    if limit is not None:
+        sorted_groups = sorted_groups[:limit]
+
+    metrics: list[GroupedExecutionMetric] = []
+    for label, rows in sorted_groups:
+        total = len(rows)
+        accepted = sum(1 for row in rows if _truthy(row.get("order_accepted")))
+        filled = sum(1 for row in rows if _truthy(row.get("filled")))
+        signal_edges = [
+            value for row in rows if (value := _safe_float(row.get("signal_edge"))) is not None
+        ]
+        signal_spreads = [
+            value for row in rows if (value := _safe_float(row.get("signal_spread"))) is not None
+        ]
+        latencies = [
+            value for row in rows if (value := _safe_float(row.get("latency_ms"))) is not None
+        ]
+
+        metrics.append(
+            GroupedExecutionMetric(
+                label=label,
+                rows=total,
+                accepted_rate=(accepted / total) if total else None,
+                fill_rate=(filled / total) if total else None,
+                avg_signal_edge=_mean_or_none(signal_edges),
+                avg_signal_spread=_mean_or_none(signal_spreads),
+                avg_latency_ms=_mean_or_none(latencies),
+            )
+        )
+    return metrics
 
 
 def summarize_edge_decay(execution_rows: Iterable[dict[str, str]]) -> EdgeDecayMetric:
@@ -168,6 +258,12 @@ def summarize_execution_quality(sample_dir: Path) -> ExecutionQualitySummary:
         edge_decay=summarize_edge_decay(executions),
         pnl_summary=summarize_pnl(settlements),
         time_bucket_counts=_count_metrics(time_bucket_counter, len(candidates)),
+        side_metrics=_execution_group_metrics(executions, lambda row: row.get("side") or "unknown"),
+        time_bucket_metrics=_execution_group_metrics(
+            executions, lambda row: row.get("time_bucket") or "unknown"
+        ),
+        edge_bucket_metrics=_execution_group_metrics(executions, _bucket_edge),
+        spread_bucket_metrics=_execution_group_metrics(executions, _bucket_spread),
     )
 
 
@@ -185,6 +281,43 @@ def metric_to_decimal(value: float | int | None, digits: int = 4) -> str:
     if value is None:
         return "n/a"
     return f"{value:.{digits}f}"
+
+
+def metric_to_ms(value: float | None) -> str:
+    """Format an optional millisecond value."""
+
+    if value is None:
+        return "n/a"
+    return f"{value:.1f}"
+
+
+def _render_grouped_metrics(title: str, metrics: list[GroupedExecutionMetric]) -> list[str]:
+    lines = [
+        f"### {title}",
+        "",
+        "| Group | Rows | Accepted rate | Fill rate | Avg signal edge | Avg spread | Avg latency ms |",
+        "|---|---:|---:|---:|---:|---:|---:|",
+    ]
+    if not metrics:
+        lines.append("| n/a | 0 | n/a | n/a | n/a | n/a | n/a |")
+        return lines
+    lines.extend(
+        "| "
+        + " | ".join(
+            [
+                metric.label,
+                str(metric.rows),
+                metric_to_percent(metric.accepted_rate),
+                metric_to_percent(metric.fill_rate),
+                metric_to_decimal(metric.avg_signal_edge),
+                metric_to_decimal(metric.avg_signal_spread),
+                metric_to_ms(metric.avg_latency_ms),
+            ]
+        )
+        + " |"
+        for metric in metrics
+    )
+    return lines
 
 
 def render_markdown(summary: ExecutionQualitySummary) -> str:
@@ -233,6 +366,21 @@ def render_markdown(summary: ExecutionQualitySummary) -> str:
         f"| {metric.label} | {metric.count} | {metric_to_percent(metric.pct_of_total)} |"
         for metric in summary.rejection_reasons
     )
+
+    lines.extend([
+        "",
+        "## Grouped execution diagnostics",
+        "",
+        "These grouped metrics are calculated on anonymized execution-attempt samples and are intended to diagnose execution quality by observable sample features.",
+        "",
+    ])
+    lines.extend(_render_grouped_metrics("By side", summary.side_metrics))
+    lines.append("")
+    lines.extend(_render_grouped_metrics("By time bucket", summary.time_bucket_metrics))
+    lines.append("")
+    lines.extend(_render_grouped_metrics("By signal edge bucket", summary.edge_bucket_metrics))
+    lines.append("")
+    lines.extend(_render_grouped_metrics("By spread bucket", summary.spread_bucket_metrics))
 
     lines.extend([
         "",
