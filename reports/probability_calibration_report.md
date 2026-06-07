@@ -18,6 +18,8 @@
 
 ## Fair probability calibration buckets
 
+![Calibration curve](figures/calibration_curve.png)
+
 | Bucket | Count | Avg forecast | Realized rate | Avg abs error |
 |---|---:|---:|---:|---:|
 | 0.0-0.1 | 2 | 0.0513 | 0.0000 | 0.0513 |

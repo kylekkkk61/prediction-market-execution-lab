@@ -252,6 +252,8 @@ def render_calibration_report(
         "",
         "## Fair probability calibration buckets",
         "",
+        "![Calibration curve](figures/calibration_curve.png)",
+        "",
         _render_bucket_table(fair_summary),
         "",
         "## Market-implied probability calibration buckets",

@@ -213,6 +213,8 @@ This report is generated from anonymized public sample data only. All PnL values
 
 ## Final normalized PnL distribution
 
+![Monte Carlo terminal PnL distribution](figures/monte_carlo_terminal_pnl.png)
+
 | Metric | Value |
 |---|---:|
 | Mean final PnL | {summary.mean_final_pnl:.4f} |
@@ -221,6 +223,8 @@ This report is generated from anonymized public sample data only. All PnL values
 | 95th percentile final PnL | {summary.p95_final_pnl:.4f} |
 
 ## Drawdown and losing-streak diagnostics
+
+![Monte Carlo drawdown distribution](figures/monte_carlo_drawdown.png)
 
 | Metric | Value |
 |---|---:|
