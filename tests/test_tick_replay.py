@@ -46,8 +46,10 @@ def test_replay_loads_sample_csv() -> None:
 
     snapshots = load_tick_snapshots_csv(sample_path)
 
-    assert len(snapshots) == 3
-    assert snapshots[0].market_id == "btc-5m-demo-001"
+    assert len(snapshots) > 0
+    assert snapshots[0].market_id.startswith("market_")
+    assert snapshots[0].current_price > 0
+    assert snapshots[0].up_ask >= snapshots[0].up_bid
 
 
 def test_replay_filters_wide_spread() -> None:

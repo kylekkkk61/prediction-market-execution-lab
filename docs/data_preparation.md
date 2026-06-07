@@ -224,19 +224,40 @@ PYTHONPATH=src .venv/bin/python scripts/inspect_private_ticks.py --max-rows-per-
 
 ### Sample generation utilities
 
-Planned script:
+Implemented script:
 
 ```text
 scripts/prepare_public_sample_data.py
 ```
 
-This script should:
+This script:
 
-- read private raw inputs locally
-- apply anonymization and filtering rules
-- write public-safe samples to `data/sample/`
-- be deterministic where practical
-- avoid requiring live execution credentials
+- reads private raw inputs locally
+- applies anonymization and filtering rules
+- writes public-safe samples to `data/sample/`
+- is deterministic where practical
+- avoids requiring live execution credentials
+
+Usage:
+
+```bash
+PYTHONPATH=src .venv/bin/python scripts/prepare_public_sample_data.py \
+  --max-tick-files 1 \
+  --max-tick-rows-per-file 100 \
+  --max-ledger-rows-per-file 100
+```
+
+Default output files:
+
+```text
+data/sample/candidates_sample.csv
+data/sample/executions_sample.csv
+data/sample/rejections_sample.csv
+data/sample/settlements_sample.csv
+data/sample/tick_snapshots_sample.csv
+```
+
+The generated files should remain small enough for public review. Larger empirical analysis should stay local or be summarized in aggregate reports.
 
 ## Validation requirements
 
