@@ -370,7 +370,7 @@ Acceptance criteria:
 - ML is presented as a signal-quality filter, not as a guaranteed profit model.
 - Walk-forward or out-of-sample validation assumptions are documented.
 
-### PR 10 — pre-public cleanup
+### PR 10 — first pre-public cleanup
 
 **Branch:** `chore/remove-private-operation-files`
 
@@ -378,24 +378,20 @@ Acceptance criteria:
 
 Scope:
 
-- Remove private-operation files.
-- Remove private model artifacts.
-- Remove or anonymize any private data.
-- Confirm public README no longer references private scripts.
+- Remove clearly unsafe production-operation files:
+  - `deploy.sh`
+  - `polymarket_auto_claim.py`
+  - `polymarket_allowance_maintenance.py`
+- Keep legacy research scripts in place for now, including backtest, ML, risk, PnL attribution, and signal dataset scripts.
+- Do not remove `bot.py` in this first cleanup PR.
+- Do not remove private raw data from the local workspace; keep it ignored by git.
 
 Acceptance criteria:
 
-- Repo can be made public without wallet, signer, private execution, or sensitive operational details.
-- Public code paths run on sample or synthetic data.
+- Public sample/report/test code paths still run without wallet, signer, allowance, relayer, claim, or live deployment configuration.
+- No private raw data, API key, wallet address, order response, or model artifact is committed.
+- Remaining root-level legacy scripts are explicitly treated as reference material pending a later audit or cleanup PR.
 
-## Current immediate next step
+## Current project status
 
-The next approved step after this plan update is private data inspection tooling:
-
-```text
-Branch: feat/add-private-data-inspection-utilities
-Commit: feat: add private data inspection utilities
-Scope: inspect private raw schemas locally and output aggregate summaries only
-```
-
-No raw private data should be committed in this or any later step.
+The project now has public sample generation, tick replay, execution-quality reporting, grouped diagnostics, Monte Carlo risk simulation, and an ML filter methodology demo. The next steps should focus on calibration/reporting, figures, notebooks, README finalization, dashboard packaging, and a later legacy-script audit.
