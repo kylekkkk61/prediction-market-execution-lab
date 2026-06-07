@@ -33,6 +33,48 @@
 | other | 643 | 64.30% |
 | risk_limit | 357 | 35.70% |
 
+## Grouped execution diagnostics
+
+These grouped metrics are calculated on anonymized execution-attempt samples and are intended to diagnose execution quality by observable sample features.
+
+### By side
+
+| Group | Rows | Accepted rate | Fill rate | Avg signal edge | Avg spread | Avg latency ms |
+|---|---:|---:|---:|---:|---:|---:|
+| UP | 586 | 34.30% | 34.30% | 0.3249 | 0.0105 | 1184.4 |
+| DOWN | 414 | 32.37% | 32.37% | 0.3155 | 0.0105 | 1573.1 |
+
+### By time bucket
+
+| Group | Rows | Accepted rate | Fill rate | Avg signal edge | Avg spread | Avg latency ms |
+|---|---:|---:|---:|---:|---:|---:|
+| 270-300 | 208 | 34.13% | 34.13% | 0.4233 | 0.0111 | 498.9 |
+| 240-270 | 170 | 34.12% | 34.12% | 0.3507 | 0.0108 | 911.1 |
+| 210-240 | 151 | 23.18% | 23.18% | 0.2960 | 0.0103 | 1610.2 |
+| 180-210 | 101 | 34.65% | 34.65% | 0.2826 | 0.0106 | 1651.9 |
+| 120-150 | 99 | 44.44% | 44.44% | 0.2745 | 0.0101 | 1334.4 |
+| 150-180 | 99 | 29.29% | 29.29% | 0.2737 | 0.0103 | 1755.8 |
+| 90-120 | 66 | 50.00% | 50.00% | 0.2607 | 0.0103 | 1158.1 |
+| 60-90 | 49 | 38.78% | 38.78% | 0.2629 | 0.0100 | 1842.0 |
+| 30-60 | 47 | 23.40% | 23.40% | 0.2770 | 0.0102 | 2266.0 |
+| 0-30 | 10 | 0.00% | 0.00% | 0.2748 | 0.0100 | 3642.6 |
+
+### By signal edge bucket
+
+| Group | Rows | Accepted rate | Fill rate | Avg signal edge | Avg spread | Avg latency ms |
+|---|---:|---:|---:|---:|---:|---:|
+| 0.25-0.35 | 555 | 34.59% | 34.59% | 0.2832 | 0.0104 | 1483.4 |
+| <0.25 | 225 | 43.11% | 43.11% | 0.2444 | 0.0104 | 1247.1 |
+| 0.35-0.50 | 135 | 21.48% | 21.48% | 0.4169 | 0.0110 | 1255.4 |
+| >=0.50 | 85 | 20.00% | 20.00% | 0.6181 | 0.0109 | 964.5 |
+
+### By spread bucket
+
+| Group | Rows | Accepted rate | Fill rate | Avg signal edge | Avg spread | Avg latency ms |
+|---|---:|---:|---:|---:|---:|---:|
+| <=0.01 | 946 | 33.30% | 33.30% | 0.3187 | 0.0100 | 1381.7 |
+| 0.01-0.02 | 54 | 37.04% | 37.04% | 0.3607 | 0.0200 | 1180.9 |
+
 ## Edge decay
 
 | Metric | Value |

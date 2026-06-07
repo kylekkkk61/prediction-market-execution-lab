@@ -40,6 +40,21 @@ def test_summarize_execution_quality_on_public_sample() -> None:
     # the unavailable edge-decay section as n/a rather than inventing values.
     assert summary.edge_decay.rows >= 0
     assert summary.pnl_summary["rows"] > 0
+    assert summary.side_metrics
+    assert summary.time_bucket_metrics
+    assert summary.edge_bucket_metrics
+    assert summary.spread_bucket_metrics
+
+
+def test_grouped_metrics_include_execution_quality_fields() -> None:
+    summary = summarize_execution_quality(Path("data/sample"))
+    side_metric = summary.side_metrics[0]
+
+    assert side_metric.rows > 0
+    assert side_metric.accepted_rate is not None
+    assert side_metric.fill_rate is not None
+    assert side_metric.avg_signal_edge is not None
+    assert side_metric.avg_signal_spread is not None
 
 
 def test_render_markdown_contains_required_sections() -> None:
@@ -49,6 +64,11 @@ def test_render_markdown_contains_required_sections() -> None:
     assert "# Execution Quality Report" in markdown
     assert "## Execution funnel" in markdown
     assert "## Rejection reason breakdown" in markdown
+    assert "## Grouped execution diagnostics" in markdown
+    assert "### By side" in markdown
+    assert "### By time bucket" in markdown
+    assert "### By signal edge bucket" in markdown
+    assert "### By spread bucket" in markdown
     assert "## Edge decay" in markdown
     assert "## Settlement PnL summary" in markdown
     assert "anonymized public sample data" in markdown
