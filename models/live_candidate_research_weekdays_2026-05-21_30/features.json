@@ -1,0 +1,78 @@
+{
+  "model_type": "live_candidate_ev_fill_aware_research",
+  "targets": {
+    "direct_ev": "target_pnl_per_sent_usd",
+    "fill_probability": "filled",
+    "filled_ev": "target_pnl_per_filled_usd"
+  },
+  "prediction_units": {
+    "score_direct_ev": "actual_pnl_per_sent_usd",
+    "score_fill_probability": "probability",
+    "score_fill_aware_ev": "fill_probability_times_filled_pnl_per_usd"
+  },
+  "feature_names": [
+    "side_is_up",
+    "elapsed_seconds",
+    "remaining_seconds",
+    "fair",
+    "edge",
+    "edge_after_fill",
+    "bid",
+    "ask",
+    "spread",
+    "limit_price",
+    "bn_price",
+    "bn_open_price",
+    "bn_return_from_open",
+    "sigma_short",
+    "sigma_long",
+    "sigma_eff",
+    "tau_seconds",
+    "z",
+    "yes_bid",
+    "yes_ask",
+    "down_bid",
+    "down_ask",
+    "yes_mid",
+    "down_mid",
+    "side_cost",
+    "opposite_cost",
+    "total_cost",
+    "is_extension_order",
+    "utc_hour",
+    "utc_day_of_week",
+    "rolling_6_market_roi",
+    "rolling_10_market_roi",
+    "rolling_10_market_win_rate",
+    "amount_usd",
+    "order_type_is_fak",
+    "order_type_is_fok",
+    "exec_mode_is_market",
+    "exec_mode_is_hybrid",
+    "exec_mode_is_edge",
+    "last_30s",
+    "limit_minus_ask",
+    "limit_minus_bid",
+    "ask_x_amount"
+  ],
+  "model_outputs": {
+    "direct_ev_model": "models/live_candidate_research_weekdays_2026-05-21_30/direct_ev_model.txt",
+    "fill_probability_model": "models/live_candidate_research_weekdays_2026-05-21_30/fill_probability_model.txt",
+    "filled_ev_model": "models/live_candidate_research_weekdays_2026-05-21_30/filled_ev_model.txt"
+  },
+  "created_at": "2026-06-03T05:04:06.194951+00:00",
+  "params": {
+    "n_estimators": 120,
+    "learning_rate": 0.04,
+    "num_leaves": 15,
+    "min_child_samples": 30,
+    "subsample": 0.9,
+    "colsample_bytree": 0.9,
+    "random_state": 42
+  },
+  "recommended_research_filter": {
+    "score": "score_fill_probability",
+    "threshold": 0.75,
+    "basis": "best combined pnl_delta_vs_baseline in current walk-forward run"
+  }
+}
