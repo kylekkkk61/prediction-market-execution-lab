@@ -158,3 +158,7 @@ def test_generate_public_samples_filters_sensitive_fields(tmp_path: Path) -> Non
     assert ticks[0]["market_slug"].startswith("slug_")
     assert "token_id" not in ticks[0]
     assert "config" not in ticks[0]
+
+    settlements = _read_csv(output_dir / "settlements_sample.csv")
+    assert settlements[0]["market_id"] == ticks[0]["market_id"]
+    assert settlements[0]["market_slug"] == ticks[0]["market_slug"]

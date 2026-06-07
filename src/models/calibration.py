@@ -1,0 +1,270 @@
+"""Probability calibration diagnostics for public sample data.
+
+This module is intentionally sample-only. It consumes anonymized public sample
+rows and compares forecast probabilities with settlement outcomes. It does not
+read private ledgers or production execution state.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+import csv
+import math
+from pathlib import Path
+from statistics import mean
+from typing import Iterable, Sequence
+
+
+@dataclass(frozen=True)
+class ForecastOutcome:
+    market_id: str
+    fair_probability: float
+    market_probability: float | None
+    outcome: int
+
+
+@dataclass(frozen=True)
+class CalibrationBucket:
+    bucket: str
+    count: int
+    avg_forecast: float
+    realized_rate: float
+    avg_abs_error: float
+
+
+@dataclass(frozen=True)
+class CalibrationSummary:
+    label: str
+    observations: int
+    brier_score: float | None
+    log_loss: float | None
+    calibration_buckets: tuple[CalibrationBucket, ...]
+
+
+def _parse_float(value: object) -> float | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    if not text:
+        return None
+    try:
+        number = float(text)
+    except ValueError:
+        return None
+    if not math.isfinite(number):
+        return None
+    return number
+
+
+def _clip_probability(value: float, eps: float = 1e-6) -> float:
+    return min(max(value, eps), 1.0 - eps)
+
+
+def _outcome_from_resolved_side(value: object) -> int | None:
+    text = str(value or "").strip().lower()
+    if text in {"up", "yes", "true", "1"}:
+        return 1
+    if text in {"down", "no", "false", "0"}:
+        return 0
+    return None
+
+
+def load_forecast_outcomes(
+    tick_path: str | Path,
+    settlements_path: str | Path,
+    *,
+    fair_probability_column: str = "fair_yes",
+    market_probability_column: str = "pm_implied_up",
+) -> list[ForecastOutcome]:
+    """Join public tick forecasts with settlement outcomes by anonymized market id.
+
+    Multiple tick rows per market are collapsed to one market-level observation by
+    averaging the available forecast probabilities. This keeps the calibration
+    unit at the market level rather than over-weighting markets with more quote
+    updates in the public sample.
+    """
+
+    tick_path = Path(tick_path)
+    settlements_path = Path(settlements_path)
+
+    forecasts: dict[str, dict[str, list[float]]] = {}
+    with tick_path.open(newline="") as handle:
+        reader = csv.DictReader(handle)
+        for row in reader:
+            market_id = (row.get("market_id") or "").strip()
+            if not market_id:
+                continue
+            fair_prob = _parse_float(row.get(fair_probability_column))
+            market_prob = _parse_float(row.get(market_probability_column))
+            bucket = forecasts.setdefault(market_id, {"fair": [], "market": []})
+            if fair_prob is not None and 0.0 <= fair_prob <= 1.0:
+                bucket["fair"].append(fair_prob)
+            if market_prob is not None and 0.0 <= market_prob <= 1.0:
+                bucket["market"].append(market_prob)
+
+    outcomes: dict[str, int] = {}
+    with settlements_path.open(newline="") as handle:
+        reader = csv.DictReader(handle)
+        for row in reader:
+            market_id = (row.get("market_id") or "").strip()
+            outcome = _outcome_from_resolved_side(row.get("resolved_side"))
+            if market_id and outcome is not None:
+                outcomes[market_id] = outcome
+
+    joined: list[ForecastOutcome] = []
+    for market_id, values in sorted(forecasts.items()):
+        if market_id not in outcomes or not values["fair"]:
+            continue
+        market_probability = mean(values["market"]) if values["market"] else None
+        joined.append(
+            ForecastOutcome(
+                market_id=market_id,
+                fair_probability=mean(values["fair"]),
+                market_probability=market_probability,
+                outcome=outcomes[market_id],
+            )
+        )
+    return joined
+
+
+def _bucket_label(probability: float, bucket_width: float) -> str:
+    lower = math.floor(probability / bucket_width) * bucket_width
+    upper = min(lower + bucket_width, 1.0)
+    if math.isclose(upper, lower):
+        upper = min(lower + bucket_width, 1.0)
+    return f"{lower:.1f}-{upper:.1f}"
+
+
+def calibration_buckets(
+    probabilities: Sequence[float],
+    outcomes: Sequence[int],
+    *,
+    bucket_width: float = 0.1,
+) -> tuple[CalibrationBucket, ...]:
+    if len(probabilities) != len(outcomes):
+        raise ValueError("probabilities and outcomes must have the same length")
+    grouped: dict[str, list[tuple[float, int]]] = {}
+    for probability, outcome in zip(probabilities, outcomes):
+        if not 0.0 <= probability <= 1.0:
+            continue
+        label = _bucket_label(min(probability, 0.999999), bucket_width)
+        grouped.setdefault(label, []).append((probability, int(outcome)))
+
+    buckets: list[CalibrationBucket] = []
+    for label in sorted(grouped):
+        rows = grouped[label]
+        avg_forecast = mean(probability for probability, _ in rows)
+        realized_rate = mean(outcome for _, outcome in rows)
+        buckets.append(
+            CalibrationBucket(
+                bucket=label,
+                count=len(rows),
+                avg_forecast=avg_forecast,
+                realized_rate=realized_rate,
+                avg_abs_error=abs(avg_forecast - realized_rate),
+            )
+        )
+    return tuple(buckets)
+
+
+def summarize_calibration(
+    forecasts: Iterable[ForecastOutcome],
+    *,
+    source: str = "fair",
+    bucket_width: float = 0.1,
+) -> CalibrationSummary:
+    probabilities: list[float] = []
+    outcomes: list[int] = []
+    for row in forecasts:
+        probability = row.fair_probability if source == "fair" else row.market_probability
+        if probability is None:
+            continue
+        probabilities.append(_clip_probability(float(probability)))
+        outcomes.append(int(row.outcome))
+
+    if not probabilities:
+        return CalibrationSummary(source, 0, None, None, tuple())
+
+    brier = mean((probability - outcome) ** 2 for probability, outcome in zip(probabilities, outcomes))
+    log_loss = mean(
+        -(outcome * math.log(probability) + (1 - outcome) * math.log(1 - probability))
+        for probability, outcome in zip(probabilities, outcomes)
+    )
+    return CalibrationSummary(
+        label=source,
+        observations=len(probabilities),
+        brier_score=brier,
+        log_loss=log_loss,
+        calibration_buckets=calibration_buckets(probabilities, outcomes, bucket_width=bucket_width),
+    )
+
+
+def _fmt(value: float | None, digits: int = 4) -> str:
+    if value is None:
+        return "n/a"
+    return f"{value:.{digits}f}"
+
+
+def _render_bucket_table(summary: CalibrationSummary) -> str:
+    if not summary.calibration_buckets:
+        return "No calibration buckets could be computed for this source.\n"
+    lines = [
+        "| Bucket | Count | Avg forecast | Realized rate | Avg abs error |",
+        "|---|---:|---:|---:|---:|",
+    ]
+    for bucket in summary.calibration_buckets:
+        lines.append(
+            "| {bucket} | {count} | {avg_forecast:.4f} | {realized_rate:.4f} | {avg_abs_error:.4f} |".format(
+                bucket=bucket.bucket,
+                count=bucket.count,
+                avg_forecast=bucket.avg_forecast,
+                realized_rate=bucket.realized_rate,
+                avg_abs_error=bucket.avg_abs_error,
+            )
+        )
+    return "\n".join(lines) + "\n"
+
+
+def render_calibration_report(
+    forecasts: Sequence[ForecastOutcome],
+    fair_summary: CalibrationSummary,
+    market_summary: CalibrationSummary,
+) -> str:
+    joined_markets = len(forecasts)
+    lines = [
+        "# Probability Calibration Report",
+        "",
+        "> This report is generated from anonymized public sample data. It is a methodology and diagnostics artifact, not a claim about production predictive performance or trading profitability.",
+        "",
+        "## Sample coverage",
+        "",
+        f"- Joined market-level observations: {joined_markets}",
+        "- Forecast unit: one averaged forecast per anonymized market id",
+        "- Outcome unit: resolved UP/DOWN settlement side from public sample settlements",
+        "- If joined observations are zero, the current public sample does not contain aligned forecast and settlement keys",
+        "",
+        "## Summary metrics",
+        "",
+        "| Source | Observations | Brier score | Log loss |",
+        "|---|---:|---:|---:|",
+        f"| Fair probability | {fair_summary.observations} | {_fmt(fair_summary.brier_score)} | {_fmt(fair_summary.log_loss)} |",
+        f"| Market-implied probability | {market_summary.observations} | {_fmt(market_summary.brier_score)} | {_fmt(market_summary.log_loss)} |",
+        "",
+        "## Fair probability calibration buckets",
+        "",
+        _render_bucket_table(fair_summary),
+        "",
+        "## Market-implied probability calibration buckets",
+        "",
+        _render_bucket_table(market_summary),
+        "",
+        "## Interpretation notes",
+        "",
+        "- Brier score and log loss are computed on public-sample market-level observations only.",
+        "- Markets with missing probabilities, unresolved settlement labels, or non-aligned anonymized keys are excluded.",
+        "- Multiple tick rows per market are averaged before scoring, so markets with more quote updates do not dominate the calibration score.",
+        "- A future public sample generation pass should preserve a consistent anonymized market key across tick and settlement samples before interpreting calibration metrics.",
+        "- The public sample is anonymized and downsampled; these diagnostics should be read as a reproducible workflow demonstration, not as a full empirical conclusion.",
+        "",
+    ]
+    return "\n".join(lines)

@@ -104,10 +104,10 @@ These grouped metrics are calculated on anonymized execution-attempt samples and
 | Metric | Value |
 |---|---:|
 | Rows with normalized PnL | 1000 |
-| Average normalized net PnL | -0.0001 |
-| Minimum normalized net PnL | -0.0942 |
-| Maximum normalized net PnL | 0.7876 |
-| Positive normalized PnL rate | 37.70% |
+| Average normalized net PnL | -0.0013 |
+| Minimum normalized net PnL | -0.2232 |
+| Maximum normalized net PnL | 0.8313 |
+| Positive normalized PnL rate | 6.80% |
 
 ## Interpretation note
 
