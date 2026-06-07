@@ -15,19 +15,19 @@ This report is generated from anonymized public sample data only. All PnL values
 
 | Metric | Value |
 |---|---:|
-| Mean final PnL | -0.1079 |
-| Median final PnL | -0.1077 |
-| 5th percentile final PnL | -2.8020 |
-| 95th percentile final PnL | 2.5592 |
+| Mean final PnL | -1.3117 |
+| Median final PnL | -1.3404 |
+| 5th percentile final PnL | -5.4459 |
+| 95th percentile final PnL | 2.8680 |
 
 ## Drawdown and losing-streak diagnostics
 
 | Metric | Value |
 |---|---:|
-| Mean max drawdown | 1.9296 |
-| 95th percentile max drawdown | 3.4702 |
-| Mean longest losing streak | 5.27 |
-| 95th percentile longest losing streak | 7.00 |
+| Mean max drawdown | 3.6700 |
+| 95th percentile max drawdown | 6.4877 |
+| Mean longest losing streak | 3.87 |
+| 95th percentile longest losing streak | 5.00 |
 
 ## Interpretation limits
 

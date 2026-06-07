@@ -169,6 +169,38 @@ def _open_tick_text(path: Path):
     return path.open("r", encoding="utf-8")
 
 
+def _tick_files(tick_dir: Path, max_files: int) -> list[Path]:
+    return [
+        path
+        for path in sorted(tick_dir.iterdir())
+        if path.name.lower().endswith(".jsonl") or path.name.lower().endswith(".jsonl.gz")
+    ][:max_files]
+
+
+def collect_tick_market_slugs(tick_dir: Path = DEFAULT_PRIVATE_TICK_DIR, *, max_files: int = 1) -> set[str]:
+    """Collect raw market slugs from selected private tick files for alignment.
+
+    Raw slugs are used only in memory to align public settlement samples with
+    public tick samples. They are never written to public sample outputs.
+    """
+
+    slugs: set[str] = set()
+    for path in _tick_files(tick_dir, max_files):
+        with _open_tick_text(path) as file_obj:
+            for line in file_obj:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    payload = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                slug = payload.get("market_slug") or payload.get("slug")
+                if slug:
+                    slugs.add(str(slug))
+    return slugs
+
+
 def _write_rows(path: Path, columns: list[str], rows: Iterable[dict[str, Any]]) -> SampleGenerationSummary:
     path.parent.mkdir(parents=True, exist_ok=True)
     count = 0
@@ -371,35 +403,43 @@ def generate_tick_sample(
 ) -> SampleGenerationSummary:
     """Generate a small anonymized tick snapshot sample."""
 
-    tick_files = [
-        path
-        for path in sorted(tick_dir.iterdir())
-        if path.name.lower().endswith(".jsonl") or path.name.lower().endswith(".jsonl.gz")
-    ]
+    tick_files = _tick_files(tick_dir, max_files)
     rows: list[dict[str, Any]] = []
-    for path in tick_files[:max_files]:
+    required = (
+        "timestamp",
+        "current_price",
+        "open_anchor_price",
+        "remaining_seconds",
+        "sigma_short",
+        "sigma_long",
+        "up_bid",
+        "up_ask",
+        "down_bid",
+        "down_ask",
+    )
+    # Raw tick files are ordered by event time, so taking the first N rows can
+    # over-sample only a few markets. Cap rows per market to make the public
+    # sample useful for market-level calibration while preserving replay rows.
+    max_rows_per_market = max(1, max_rows_per_file // 300)
+    for path in tick_files:
+        rows_this_file = 0
+        rows_by_market: dict[str, int] = {}
         with _open_tick_text(path) as file_obj:
             for line in file_obj:
-                if len(rows) >= max_files * max_rows_per_file:
+                if rows_this_file >= max_rows_per_file:
                     break
                 line = line.strip()
                 if not line:
                     continue
                 row = sanitize_tick_payload(json.loads(line))
-                required = (
-                    "timestamp",
-                    "current_price",
-                    "open_anchor_price",
-                    "remaining_seconds",
-                    "sigma_short",
-                    "sigma_long",
-                    "up_bid",
-                    "up_ask",
-                    "down_bid",
-                    "down_ask",
-                )
-                if row.get("market_id") and all(row.get(column) not in (None, "") for column in required):
-                    rows.append(row)
+                market_id = row.get("market_id")
+                if not market_id or not all(row.get(column) not in (None, "") for column in required):
+                    continue
+                if rows_by_market.get(market_id, 0) >= max_rows_per_market:
+                    continue
+                rows.append(row)
+                rows_this_file += 1
+                rows_by_market[market_id] = rows_by_market.get(market_id, 0) + 1
     return _write_rows(output_path, TICK_SAMPLE_COLUMNS, rows)
 
 
@@ -408,8 +448,14 @@ def generate_ledger_sample(
     output_dir: Path = DEFAULT_PUBLIC_SAMPLE_DIR,
     *,
     max_rows_per_file: int = 250,
+    settlement_market_slugs: set[str] | None = None,
 ) -> tuple[SampleGenerationSummary, ...]:
-    """Generate anonymized public ledger samples from selected ledger CSVs."""
+    """Generate anonymized public ledger samples from selected ledger CSVs.
+
+    If settlement_market_slugs is provided, market_settlements.csv is sampled by
+    aligned tick-market membership first. This keeps calibration samples joinable
+    without exposing raw market slugs.
+    """
 
     configs = {
         "raw_candidates.csv": ("candidates_sample.csv", CANDIDATE_COLUMNS, _sanitize_candidate),
@@ -426,6 +472,9 @@ def generate_ledger_sample(
         with source_path.open("r", encoding="utf-8", newline="") as file_obj:
             reader = csv.DictReader(file_obj)
             for row in reader:
+                if source_name == "market_settlements.csv" and settlement_market_slugs:
+                    if row.get("market_slug") not in settlement_market_slugs:
+                        continue
                 if len(rows) >= max_rows_per_file:
                     break
                 rows.append(sanitizer(row))
@@ -444,19 +493,20 @@ def generate_public_samples(
 ) -> tuple[SampleGenerationSummary, ...]:
     """Generate all public-safe sample CSVs."""
 
+    settlement_market_slugs = collect_tick_market_slugs(tick_dir, max_files=max_tick_files)
+    tick_summary = generate_tick_sample(
+        tick_dir=tick_dir,
+        output_path=output_dir / "tick_snapshots_sample.csv",
+        max_files=max_tick_files,
+        max_rows_per_file=max_tick_rows_per_file,
+    )
     summaries = list(
         generate_ledger_sample(
             ledger_dir=ledger_dir,
             output_dir=output_dir,
             max_rows_per_file=max_ledger_rows_per_file,
+            settlement_market_slugs=settlement_market_slugs,
         )
     )
-    summaries.append(
-        generate_tick_sample(
-            tick_dir=tick_dir,
-            output_path=output_dir / "tick_snapshots_sample.csv",
-            max_files=max_tick_files,
-            max_rows_per_file=max_tick_rows_per_file,
-        )
-    )
+    summaries.append(tick_summary)
     return tuple(summaries)
