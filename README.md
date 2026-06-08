@@ -42,9 +42,9 @@ The main distinction is between:
 
 ## What This Project Shows
 
-The public sample does not support a profitability claim. In the sample-backed reports, normalized settlement PnL is weak and slightly negative on average, while the positive normalized PnL rate is low. The core research takeaway is that apparent signal edge can be materially eroded by execution acceptance, fill probability, timing, spread, latency, and settlement outcomes.
+The public sample does not support a profitability claim. My conclusion from this sample is that the strategy did not yet convert theoretical edge into reliable realized PnL. Normalized settlement PnL is weak and slightly negative on average, while the positive normalized PnL rate is low.
 
-The value of the project is the diagnostic workflow: it separates theoretical pricing edge from executable edge, then makes the erosion visible through replay, execution-quality reports, probability calibration, risk simulation, and filter diagnostics.
+The more interesting finding is where the edge disappeared. Pure tick replay and simulated backtests can show positive edge, but live-like execution records gave a different answer once failed order submission, latency, quote staleness, API variability, fill probability, model gates, and settlement outcomes were included. The value of the project is the diagnostic workflow: it separates theoretical pricing edge from executable edge, then makes the simulation-to-live gap visible through replay, execution-quality reports, probability calibration, risk simulation, and filter diagnostics.
 
 ## Why Prediction Markets
 
@@ -60,7 +60,7 @@ Short-horizon BTC markets are useful for this project because they combine:
 
 The project does not attempt to predict BTC direction as its primary claim. It studies whether apparent prediction-market mispricings remain actionable after microstructure and execution constraints are applied.
 
-The fair-probability workflow uses Binance BTCUSDT-style reference prices as a high-frequency proxy for BTC spot movement. The motivation is that centralized exchange prices can update faster than prediction-market quotes and oracle- or settlement-linked market references. This is treated as a research assumption and diagnostic input, not as proof of a persistent lead-lag alpha.
+The fair-probability workflow uses Binance BTCUSDT spot ticks as the faster reference layer and Binance-derived bucket open prices as the opening-anchor proxy. Polymarket BTC markets settle against an oracle-style reference rather than Binance directly. My working assumption, consistent with common player observations in these markets, is that the resolution-linked reference tends to follow Binance-style spot movement with a short delay. This repository does not yet include a dedicated lead-lag validation study, so the lag is treated as a domain-informed assumption rather than a proven empirical claim.
 
 ## Repository Structure
 
