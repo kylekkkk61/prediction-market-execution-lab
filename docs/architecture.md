@@ -1,10 +1,10 @@
 # Architecture
 
-This document outlines the planned public architecture for the research version of the project.
+This document outlines the public architecture for Prediction Market Execution Lab.
 
-The current repository is still in migration. Some legacy scripts may remain in the root directory until their public-safe logic is extracted into `src/`.
+The repository is organized around public-safe modules, demo scripts, sample-backed reports, notebooks, and a Streamlit dashboard.
 
-## Planned System Flow
+## System Flow
 
 ```mermaid
 flowchart LR
@@ -22,35 +22,23 @@ flowchart LR
     K --> H
     K --> L[Risk Simulation]
     L --> H
+    H --> M[Streamlit Dashboard]
 ```
 
-## Planned Repository Structure
+## Repository Structure
 
 ```text
 src/
-├── data_sources/
-│   ├── binance.py
-│   └── polymarket.py
-├── models/
-│   ├── fair_probability.py
-│   └── ml_filter.py
-├── execution_quality/
-│   ├── edge.py
-│   ├── spread.py
-│   ├── fill_analysis.py
-│   └── pnl_attribution.py
-├── backtesting/
-│   ├── tick_replay.py
-│   └── walk_forward.py
-├── risk/
-│   └── monte_carlo.py
-└── utils/
-    ├── config.py
-    └── plotting.py
+├── data_sources/          # Public sample loading and private schema inspection helpers
+├── models/                # Fair probability, calibration, and ML-filter demos
+├── execution_quality/     # Edge, spread, fill, and PnL diagnostics
+├── backtesting/           # Tick-level replay logic
+├── risk/                  # Monte Carlo risk simulation
+└── utils/                 # Anonymization and shared utilities
 ```
 
-## Migration Notes
+Public scripts under `scripts/` generate reports, figures, sample data, and local inspection summaries. The dashboard under `dashboard/` reads only public sample files and generated report artifacts.
 
-Public modules should be extracted from legacy scripts gradually.
+## Public-Safe Boundary
 
-The public architecture should avoid direct wallet operations, production deployment scripts, private execution runbooks, and raw private trading records.
+The public architecture avoids direct wallet operations, production deployment scripts, private execution runbooks, raw private trading records, and private model artifacts. Demo workflows run on anonymized, downsampled, normalized sample data.

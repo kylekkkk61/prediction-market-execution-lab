@@ -1,8 +1,9 @@
-"""Public-sample ML-assisted signal filtering demo.
+"""Public-sample ML-assisted signal filtering workflow demo.
 
-This module intentionally implements a lightweight, deterministic baseline rather
-than a production ML model. It demonstrates feature preparation, chronological
-splitting, scoring, and diagnostic reporting on anonymized public sample data.
+This module intentionally implements a lightweight, deterministic learned-threshold
+baseline rather than a production ML model. It demonstrates feature preparation,
+chronological splitting, scoring, and diagnostic reporting on anonymized public
+sample data.
 """
 
 from __future__ import annotations
@@ -221,14 +222,16 @@ def format_rate(value: float | None) -> str:
 def render_ml_filter_report(
     train: FilterDiagnostics,
     test: FilterDiagnostics,
-    *, source_path: str = "data/sample/executions_sample.csv",
+    *,
+    source_path: str = "data/sample/executions_sample.csv",
 ) -> str:
-    """Render a sample-only ML filter methodology report."""
+    """Render a sample-only ML filter workflow report."""
 
     thresholds = test.thresholds
+    test_note = _filter_interpretation_note(test)
     return "\n".join(
         [
-            "# ML Filter Methodology Report",
+            "# ML Filter Workflow Report",
             "",
             "This report demonstrates a public-sample workflow for ML-assisted signal filtering.",
             "It uses anonymized sample data and does not establish production predictive performance or trading profitability.",
@@ -241,8 +244,9 @@ def render_ml_filter_report(
             "",
             "## Baseline filter",
             "",
-            "The demo uses a transparent threshold-based baseline rather than a production model.",
+            "The public demo uses a transparent learned-threshold baseline rather than a shipped production ML model.",
             "Thresholds are fitted on the earlier sample segment and applied to the later segment.",
+            "No private model artifact, raw model score, or production threshold is loaded by this demo.",
             "",
             "| Threshold | Value |",
             "|---|---:|",
@@ -257,14 +261,47 @@ def render_ml_filter_report(
             _diagnostic_row("Train", train),
             _diagnostic_row("Test", test),
             "",
+            "## What the public baseline shows",
+            "",
+            test_note,
+            "",
+            "This is useful as a validation example: a filter can be mechanically reasonable, yet fail to improve out-of-sample label quality on the public sample. That is why this project treats ML as a validation workflow, not as an alpha claim.",
+            "",
             "## Interpretation limits",
             "",
             "- These diagnostics are based on anonymized public sample rows, not the full private ledger.",
             "- The baseline is designed to demonstrate validation workflow, not to prove predictive edge.",
             "- Public sample labels may be sparse or simplified after anonymization.",
-            "- A production ML filter would require stricter walk-forward validation, richer feature audits, and leakage checks on private data.",
+            "- The report does not replay the original private ML model or expose raw model scores.",
+            "- A future extension can add true ML score and decision diagnostics if fields such as `ml_score`, `ml_passed`, or `blocked_ml_filter` can be safely anonymized and bucketed.",
         ]
     ) + "\n"
+
+
+def _filter_interpretation_note(diagnostics: FilterDiagnostics) -> str:
+    """Return a concise public interpretation of test-segment filter diagnostics."""
+
+    if (
+        diagnostics.positive_rate_all is None
+        or diagnostics.positive_rate_passed is None
+        or diagnostics.positive_rate_rejected is None
+    ):
+        return (
+            "The public sample does not contain enough labels to evaluate whether "
+            "the baseline improves the target label rate."
+        )
+    if diagnostics.positive_rate_passed <= diagnostics.positive_rate_all:
+        return (
+            "On the public test segment, the baseline does not improve the positive "
+            "label rate: passed rows show "
+            f"{format_rate(diagnostics.positive_rate_passed)} versus "
+            f"{format_rate(diagnostics.positive_rate_all)} overall."
+        )
+    return (
+        "On the public test segment, the baseline improves the positive label rate: "
+        f"passed rows show {format_rate(diagnostics.positive_rate_passed)} versus "
+        f"{format_rate(diagnostics.positive_rate_all)} overall."
+    )
 
 
 def _diagnostic_row(name: str, diagnostics: FilterDiagnostics) -> str:

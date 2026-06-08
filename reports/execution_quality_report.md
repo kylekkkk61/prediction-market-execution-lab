@@ -120,3 +120,5 @@ These grouped metrics are calculated on anonymized execution-attempt samples and
 ## Interpretation note
 
 These metrics are intended to demonstrate the analysis pipeline. The public sample is anonymized, downsampled, and field-filtered, so it should not be interpreted as full strategy performance.
+
+In this public sample, normalized settlement PnL is weak and slightly negative on average, while the positive normalized PnL rate is low. This supports the central project lesson: visible signal edge is not equivalent to executable edge after acceptance, fill probability, timing, spread, latency, and settlement outcomes are incorporated.
