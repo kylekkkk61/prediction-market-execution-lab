@@ -2,6 +2,18 @@
 
 > This report is generated from anonymized public sample data. It is a methodology and diagnostics artifact, not a claim about production predictive performance or trading profitability.
 
+## Why calibration matters
+
+Prediction-market prices can be read as market-implied probabilities, but a useful research model must also be calibrated against realized outcomes. Calibration diagnostics test whether forecast probabilities behave like probabilities rather than just producing directional scores.
+
+## Fair probability vs market-implied probability
+
+The report compares two probability sources when public sample fields are available: a model-estimated fair probability and a market-implied probability derived from prediction-market quotes. The comparison is diagnostic only; it does not establish that either source is consistently superior in live trading.
+
+## Binance/reference price assumption
+
+The fair-probability workflow uses Binance BTCUSDT-style reference prices as a high-frequency proxy for BTC spot movement. The motivation is that centralized exchange prices can update faster than prediction-market quotes and oracle- or settlement-linked references. This is a research assumption and diagnostic input, not proof of a persistent lead-lag alpha.
+
 ## Sample coverage
 
 - Joined market-level observations: 986
@@ -15,6 +27,10 @@
 |---|---:|---:|---:|
 | Fair probability | 986 | 0.2378 | 0.6679 |
 | Market-implied probability | 986 | 0.2358 | 0.6639 |
+
+## How to read Brier score and log loss
+
+Brier score measures squared probability error, where lower is better. Log loss penalizes confident wrong probabilities more severely, so it is sensitive to overconfident forecasts. Both metrics are computed only on joined public-sample observations.
 
 ## Fair probability calibration buckets
 
@@ -50,10 +66,20 @@
 | 0.9-1.0 | 2 | 0.9565 | 1.0000 | 0.0435 |
 
 
+## What calibration can suggest
+
+Calibration buckets can show whether forecasts are systematically too high or too low in parts of the probability range. In this public sample, they should be treated as a workflow demonstration because the data is anonymized, downsampled, and collapsed to market-level observations.
+
+## What calibration cannot prove
+
+- Calibration metrics do not prove executable edge or profitability.
+- Averaging multiple tick rows into one market-level observation removes intra-market timing information.
+- A well-calibrated probability can still fail after spread, fill probability, latency, or position limits.
+- A poor public-sample calibration result may reflect sample construction, limited observations, or anonymization rather than a general model failure.
+
 ## Interpretation notes
 
 - Brier score and log loss are computed on public-sample market-level observations only.
 - Markets with missing probabilities, unresolved settlement labels, or non-aligned anonymized keys are excluded.
 - Multiple tick rows per market are averaged before scoring, so markets with more quote updates do not dominate the calibration score.
-- A future public sample generation pass should preserve a consistent anonymized market key across tick and settlement samples before interpreting calibration metrics.
 - The public sample is anonymized and downsampled; these diagnostics should be read as a reproducible workflow demonstration, not as a full empirical conclusion.

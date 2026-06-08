@@ -69,6 +69,6 @@ def test_render_markdown_contains_required_sections() -> None:
     assert "### By time bucket" in markdown
     assert "### By signal edge bucket" in markdown
     assert "### By spread bucket" in markdown
-    assert "## Edge decay" in markdown
+    assert "## Edge before and after execution" in markdown
     assert "## Settlement PnL summary" in markdown
     assert "anonymized public sample data" in markdown

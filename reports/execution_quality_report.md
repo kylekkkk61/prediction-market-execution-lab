@@ -2,6 +2,14 @@
 
 > This report is generated from anonymized public sample data. It is a reproducible demo report, not a claim about complete live performance.
 
+## Research question
+
+This report asks whether apparent short-horizon prediction-market edge survives the execution funnel. The central distinction is between a signal that looks attractive at quote time and a signal that remains executable after spread, latency, fill probability, rejection logic, and settlement outcomes are applied.
+
+## Sample and data policy
+
+The report uses public sample CSV files only. Candidate, execution, rejection, and settlement records are anonymized, downsampled, and field-filtered. Monetary scale is bucketed or normalized where needed, and private operational fields such as wallet identifiers, raw order IDs, signer details, model paths, and raw responses are excluded.
+
 ## Sample coverage
 
 | Dataset | Rows |
@@ -12,6 +20,8 @@
 | Market settlements | 1000 |
 
 ## Execution funnel
+
+The funnel shows how many candidate signals remain after they pass through attempted execution, acceptance, fill, rejection, and settlement-style sample states. This is the key place where theoretical edge can disappear before it becomes executable edge.
 
 ![Signal funnel](figures/signal_funnel.png)
 
@@ -31,6 +41,8 @@
 | simulated | 29 | 2.90% |
 
 ## Rejection reason breakdown
+
+Rejection categories identify where candidate signals fail before becoming executable. They should be interpreted as execution-quality diagnostics rather than as live trading rules.
 
 | Reason | Count | Share |
 |---|---:|---:|
@@ -83,7 +95,9 @@ These grouped metrics are calculated on anonymized execution-attempt samples and
 | <=0.01 | 955 | 5.86% | 5.86% | 0.3202 | 0.0100 | 589.8 |
 | 0.01-0.02 | 45 | 4.44% | 4.44% | 0.3245 | 0.0200 | 447.8 |
 
-## Edge decay
+## Edge before and after execution
+
+This section compares signal-time edge with an execution-adjusted estimate when the public sample contains the required fields. The difference is a direct diagnostic of how much apparent edge is eroded by fill assumptions and execution constraints.
 
 | Metric | Value |
 |---|---:|
@@ -109,6 +123,8 @@ These grouped metrics are calculated on anonymized execution-attempt samples and
 
 ## Settlement PnL summary
 
+Settlement PnL is reported in normalized public-sample units. It is useful for directionally understanding whether filtered signals translated into favorable outcomes, but it is not account-level PnL and should not be interpreted as complete strategy performance.
+
 | Metric | Value |
 |---|---:|
 | Rows with normalized PnL | 1000 |
@@ -117,8 +133,15 @@ These grouped metrics are calculated on anonymized execution-attempt samples and
 | Maximum normalized net PnL | 0.8313 |
 | Positive normalized PnL rate | 6.80% |
 
-## Interpretation note
+## What the public sample suggests
 
 These metrics are intended to demonstrate the analysis pipeline. The public sample is anonymized, downsampled, and field-filtered, so it should not be interpreted as full strategy performance.
 
 In this public sample, normalized settlement PnL is weak and slightly negative on average, while the positive normalized PnL rate is low. This supports the central project lesson: visible signal edge is not equivalent to executable edge after acceptance, fill probability, timing, spread, latency, and settlement outcomes are incorporated.
+
+## What cannot be concluded
+
+- The report does not prove that a live strategy is profitable or unprofitable across all market regimes.
+- The sample does not reconstruct full private account history, real capital constraints, fees, or every venue-level fill dynamic.
+- Grouped diagnostics can show associations between sample features and outcomes, but they should not be read as causal proof.
+- Live execution would require additional latency, market-depth, and operational-risk validation outside this public repository.
