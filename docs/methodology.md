@@ -86,7 +86,7 @@ public sample executions
 → pass/reject diagnostics
 ```
 
-This demo is not evidence of production predictive performance or trading profitability. It also does not replay the original private ML model. A future extension can add true ML score and decision diagnostics, such as `ml_score`, `ml_passed`, or `blocked_ml_filter`, if those fields can be safely anonymized and bucketed from the private ledger.
+This demo is not evidence of production predictive performance or trading profitability. It also does not replay the original private ML model. The public sample now includes safe scalar decision diagnostics such as `ml_predicted_ev`, `ml_min_ev`, `ml_passed`, `ml_reason`, `fill_probability`, and `fill_prob_passed`. Model paths, feature-name lists, raw feature JSON, raw responses, order IDs, wallet identifiers, and signer/deployment details remain excluded.
 
 ## 10. Risk Simulation
 

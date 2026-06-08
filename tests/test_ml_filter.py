@@ -4,6 +4,7 @@ from models.ml_filter import (
     chronological_split,
     evaluate_filter,
     fit_baseline_thresholds,
+    load_public_model_decision_diagnostics,
     load_signal_examples,
     passes_filter,
     render_ml_filter_report,
@@ -81,7 +82,17 @@ def test_walk_forward_demo_and_report_render_on_public_sample():
     assert "ML Filter Workflow Report" in report
     assert "does not establish production predictive performance" in report
     assert "chronological train/test split" in report
-    assert "does not replay the original private ML model" in report
+    assert "Exported private-ledger ML diagnostics" in report
+    assert "does not export model paths" in report
+
+
+def test_public_model_decision_diagnostics_loads_safe_exported_fields():
+    diagnostics = load_public_model_decision_diagnostics("data/sample/executions_sample.csv")
+
+    assert diagnostics.row_count > 0
+    assert diagnostics.ml_enabled_count >= 0
+    assert diagnostics.ml_scored_count >= 0
+    assert diagnostics.fill_probability_count >= 0
 
 
 def test_fit_baseline_thresholds_handles_empty_examples():

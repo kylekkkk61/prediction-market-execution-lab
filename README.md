@@ -135,7 +135,7 @@ The public research workflow is organized around the following components.
    Use demonstration-only trade outcome samples to estimate drawdown, terminal PnL dispersion, and sensitivity to execution assumptions.
 
 8. **ML-assisted signal filtering workflow**
-   Demonstrate a chronological train/test validation workflow with a transparent learned-threshold baseline. The public demo does not ship or load a production ML model artifact; true ML score/decision diagnostics are a planned extension if they can be safely anonymized from private ledger fields.
+   Demonstrate a chronological train/test validation workflow with a transparent learned-threshold baseline, plus public-safe scalar ML and fill-probability diagnostics exported from the private ledger. The public demo does not ship or load a production ML model artifact and does not expose model paths, raw feature JSON, wallet identifiers, order IDs, or raw responses.
 
 See [`docs/methodology.md`](docs/methodology.md) for a fuller explanation.
 

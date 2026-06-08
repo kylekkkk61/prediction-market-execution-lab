@@ -6,7 +6,12 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from models.ml_filter import load_signal_examples, render_ml_filter_report, run_walk_forward_demo
+from models.ml_filter import (
+    load_public_model_decision_diagnostics,
+    load_signal_examples,
+    render_ml_filter_report,
+    run_walk_forward_demo,
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -34,7 +39,13 @@ def main() -> None:
     args = parse_args()
     examples = load_signal_examples(args.input, label_column="filled")
     train, test = run_walk_forward_demo(examples, train_fraction=args.train_fraction)
-    report = render_ml_filter_report(train, test, source_path=args.input)
+    model_diagnostics = load_public_model_decision_diagnostics(args.input)
+    report = render_ml_filter_report(
+        train,
+        test,
+        source_path=args.input,
+        model_diagnostics=model_diagnostics,
+    )
 
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
