@@ -45,7 +45,7 @@ This repository is **not** a trading bot, production execution system, or profit
 
 | Artifact | Description |
 |---|---|
-| [`dashboard/app.py`](dashboard/app.py) | Streamlit dashboard for public-sample execution diagnostics. |
+| [`dashboard/app.py`](dashboard/app.py) | Streamlit dashboard for public-sample execution diagnostics. Deployment notes: [`docs/deployment.md`](docs/deployment.md). |
 | [`reports/execution_quality_report.md`](reports/execution_quality_report.md) | Signal funnel, rejection reasons, edge before/after execution, settlement PnL, author takeaways. |
 | [`reports/probability_calibration_report.md`](reports/probability_calibration_report.md) | Fair probability vs market-implied calibration, tail-bucket instability, Binance reference-price assumption. |
 | [`reports/ml_filter_report.md`](reports/ml_filter_report.md) | ML EV gate, fill-probability diagnostics, walk-forward validation, overfitting limitations. |
