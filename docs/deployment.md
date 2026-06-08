@@ -61,11 +61,13 @@ The dashboard should load without requiring environment variables or private fil
 
 ## Public dashboard URL
 
-After deployment, Streamlit Community Cloud will provide a public app URL under the `streamlit.app` domain.
+The verified public dashboard is available at:
 
-Do not add a placeholder live URL to the README before the app is actually deployed and verified.
+```text
+https://prediction-market-execution-lab-4byaayq2atzengbe26nkfb.streamlit.app/
+```
 
-Once verified, update the README dashboard entry with the live app URL.
+The dashboard is a public-sample demonstration. It reads only tracked sample data and generated report artifacts, and it does not connect to private ledgers, wallets, exchanges, live market APIs, order-routing systems, or execution infrastructure.
 
 ## Custom domain strategy
 
