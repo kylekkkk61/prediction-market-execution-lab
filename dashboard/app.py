@@ -43,10 +43,10 @@ def format_number(value: float | int | None, digits: int = 4) -> str:
     return f"{value:,.{digits}f}"
 
 
-def image_if_available(path: Path, caption: str) -> None:
+def image_if_available(path: Path, caption: str, width: int | str = "stretch") -> None:
     """Render an existing figure if it is present in the repository."""
     if path.exists():
-        st.image(str(path), caption=caption, width="stretch")
+        st.image(str(path), caption=caption, width=width)
     else:
         st.info(f"Figure not found: {path.relative_to(ROOT)}")
 
@@ -212,7 +212,7 @@ def render_report_markdown_preview(text: str, max_chars: int = 4000) -> None:
         flush_markdown()
         image_path = REPORTS_DIR / match.group("path")
         caption = match.group("caption") or image_path.name
-        image_if_available(image_path, caption)
+        image_if_available(image_path, caption, width=760)
 
     flush_markdown()
     if len(text) > max_chars:
