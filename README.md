@@ -50,7 +50,7 @@ This repository is **not** a trading bot, production execution system, or profit
 | [`reports/probability_calibration_report.md`](reports/probability_calibration_report.md) | Fair probability vs market-implied calibration, tail-bucket instability, Binance reference-price assumption. |
 | [`reports/ml_filter_report.md`](reports/ml_filter_report.md) | ML EV gate, fill-probability diagnostics, walk-forward validation, overfitting limitations. |
 | [`reports/risk_simulation_report.md`](reports/risk_simulation_report.md) | Monte Carlo terminal PnL, drawdown, losing-streak, and path-dependency diagnostics. |
-| [`notebooks/`](notebooks/) | Public-sample data overview and execution-quality analysis notebooks. |
+| [`notebooks/`](notebooks/) | Six-notebook research walkthrough covering sample data, execution quality, reference price, calibration, ML diagnostics, and risk simulation. |
 | [`docs/methodology.md`](docs/methodology.md) | Methodology details, fair probability formula, reference-price assumptions, gate sequence. |
 | [`docs/limitations.md`](docs/limitations.md) | Scope limits, replay/live gap, reference-lag assumption, ML/filter caveats. |
 
