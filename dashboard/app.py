@@ -203,7 +203,8 @@ def render_ml_diagnostics(executions: pd.DataFrame) -> None:
         fill_passed = executions["fill_prob_passed"].dropna().astype(str).str.lower().isin({"true", "1", "yes"})
         diagnostics.append({"metric": "Fill-probability pass rate", "value": format_rate(fill_passed.mean())})
 
-    st.dataframe(pd.DataFrame(diagnostics), width="stretch", hide_index=True)
+    diagnostics_frame = pd.DataFrame(diagnostics).astype(str)
+    st.dataframe(diagnostics_frame, width="stretch", hide_index=True)
 
     columns = st.columns(2)
     with columns[0]:
