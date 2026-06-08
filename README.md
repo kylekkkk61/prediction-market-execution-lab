@@ -75,7 +75,7 @@ prediction-market-execution-lab/
 └── uv.lock                       # Locked uv environment
 ```
 
-Some root-level legacy reference scripts may remain until the final cleanup PR. They are not positioned as public demo entry points and should not be interpreted as production-ready modules.
+Root-level legacy research scripts and tracked private model artifacts have been removed from the public demo surface. Public entry points live under `scripts/`, `src/`, `notebooks/`, `reports/`, and `dashboard/`.
 
 ## Data and Sample Policy
 

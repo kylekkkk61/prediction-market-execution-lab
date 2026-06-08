@@ -15,8 +15,12 @@ SRC_ROOT = PROJECT_ROOT / "src"
 if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
-from backtesting.tick_replay import ReplayConfig, load_tick_snapshots_csv, replay_tick_snapshots
-from execution_quality.edge import ExecutionEdgeConfig
+from backtesting.tick_replay import (  # noqa: E402
+    ReplayConfig,
+    load_tick_snapshots_csv,
+    replay_tick_snapshots,
+)
+from execution_quality.edge import ExecutionEdgeConfig  # noqa: E402
 
 
 def parse_args() -> argparse.Namespace:

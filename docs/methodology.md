@@ -1,6 +1,6 @@
 # Methodology
 
-This document describes the planned public methodology. The implementation will be extracted gradually from the legacy working codebase into clean, documented research modules.
+This document describes the public methodology implemented in the research-oriented codebase. The workflow is designed for reproducible sample-backed diagnostics, not live execution or strategy deployment.
 
 ## 1. Market Price as Implied Probability
 
