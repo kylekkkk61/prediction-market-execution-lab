@@ -84,8 +84,15 @@ CANDIDATE_COLUMNS = [
     "signal_spread",
     "limit_price",
     "edge_after_fill_estimate",
+    "ml_filter_enabled",
+    "ml_predicted_ev",
+    "ml_min_ev",
+    "ml_passed",
+    "ml_reason",
     "fill_probability",
+    "fill_prob_min_probability",
     "fill_prob_passed",
+    "fill_prob_reason",
 ]
 
 EXECUTION_COLUMNS = [
@@ -107,6 +114,15 @@ EXECUTION_COLUMNS = [
     "signal_spread",
     "limit_price",
     "edge_after_fill_estimate",
+    "ml_filter_enabled",
+    "ml_predicted_ev",
+    "ml_min_ev",
+    "ml_passed",
+    "ml_reason",
+    "fill_probability",
+    "fill_prob_min_probability",
+    "fill_prob_passed",
+    "fill_prob_reason",
     "order_sent",
     "order_accepted",
     "filled",
@@ -254,6 +270,23 @@ def _category(value: Any) -> str:
     return "other"
 
 
+def _safe_reason(value: Any) -> str:
+    """Return a coarse public-safe reason category for model/filter decisions."""
+
+    if value is None or value == "":
+        return "none"
+    text = str(value).strip().lower()
+    if "predicted_ev" in text and "threshold" in text:
+        return "predicted_ev_below_threshold"
+    if "prob" in text and "threshold" in text:
+        return "probability_below_threshold"
+    if "threshold" in text:
+        return "below_threshold"
+    if "passed" in text or text in {"true", "1"}:
+        return "passed"
+    return _category(text)
+
+
 def sanitize_tick_payload(payload: dict[str, Any]) -> dict[str, Any]:
     """Return a public-safe tick row with only replay/reporting fields."""
 
@@ -318,8 +351,15 @@ def _sanitize_candidate(row: dict[str, Any]) -> dict[str, Any]:
         "signal_spread": safe_probability(_first_present(row, ("signal_spread", "spread"))),
         "limit_price": safe_probability(row.get("limit_price")),
         "edge_after_fill_estimate": safe_numeric(row.get("edge_after_fill_estimate"), digits=6),
+        "ml_filter_enabled": row.get("ml_filter_enabled"),
+        "ml_predicted_ev": safe_numeric(row.get("ml_predicted_ev"), digits=6),
+        "ml_min_ev": safe_numeric(row.get("ml_min_ev"), digits=6),
+        "ml_passed": row.get("ml_passed"),
+        "ml_reason": _safe_reason(row.get("ml_reason")),
         "fill_probability": safe_probability(row.get("fill_probability")),
+        "fill_prob_min_probability": safe_probability(row.get("fill_prob_min_probability")),
         "fill_prob_passed": row.get("fill_prob_passed"),
+        "fill_prob_reason": _safe_reason(row.get("fill_prob_reason")),
     }
 
 
@@ -343,6 +383,15 @@ def _sanitize_execution(row: dict[str, Any]) -> dict[str, Any]:
         "signal_spread": safe_probability(_first_present(row, ("signal_spread", "spread"))),
         "limit_price": safe_probability(row.get("limit_price")),
         "edge_after_fill_estimate": safe_numeric(row.get("edge_after_fill_estimate"), digits=6),
+        "ml_filter_enabled": row.get("ml_filter_enabled"),
+        "ml_predicted_ev": safe_numeric(row.get("ml_predicted_ev"), digits=6),
+        "ml_min_ev": safe_numeric(row.get("ml_min_ev"), digits=6),
+        "ml_passed": row.get("ml_passed"),
+        "ml_reason": _safe_reason(row.get("ml_reason")),
+        "fill_probability": safe_probability(row.get("fill_probability")),
+        "fill_prob_min_probability": safe_probability(row.get("fill_prob_min_probability")),
+        "fill_prob_passed": row.get("fill_prob_passed"),
+        "fill_prob_reason": _safe_reason(row.get("fill_prob_reason")),
         "order_sent": row.get("order_sent"),
         "order_accepted": row.get("order_accepted"),
         "filled": row.get("filled"),
@@ -443,6 +492,19 @@ def generate_tick_sample(
     return _write_rows(output_path, TICK_SAMPLE_COLUMNS, rows)
 
 
+def _model_diagnostic_priority(row: dict[str, Any]) -> int:
+    """Return sampling priority for public-safe model diagnostics."""
+
+    if row.get("fill_probability") not in (None, "") or row.get("fill_prob_passed") not in (
+        None,
+        "",
+    ):
+        return 2
+    if row.get("ml_predicted_ev") not in (None, ""):
+        return 1
+    return 0
+
+
 def generate_ledger_sample(
     ledger_dir: Path = DEFAULT_PRIVATE_LEDGER_DIR,
     output_dir: Path = DEFAULT_PUBLIC_SAMPLE_DIR,
@@ -469,16 +531,32 @@ def generate_ledger_sample(
         if not source_path.exists():
             continue
         rows = []
+        secondary_rows = []
+        deferred_rows = []
         with source_path.open("r", encoding="utf-8", newline="") as file_obj:
             reader = csv.DictReader(file_obj)
             for row in reader:
                 if source_name == "market_settlements.csv" and settlement_market_slugs:
                     if row.get("market_slug") not in settlement_market_slugs:
                         continue
-                if len(rows) >= max_rows_per_file:
+                sanitized = sanitizer(row)
+                if source_name == "execution_attempts.csv":
+                    priority = _model_diagnostic_priority(row)
+                    if priority == 2 and len(rows) < max_rows_per_file:
+                        rows.append(sanitized)
+                        continue
+                    if priority == 1 and len(secondary_rows) < max_rows_per_file:
+                        secondary_rows.append(sanitized)
+                        continue
+                if len(deferred_rows) < max_rows_per_file:
+                    deferred_rows.append(sanitized)
+                if source_name != "execution_attempts.csv" and len(rows) + len(deferred_rows) >= max_rows_per_file:
                     break
-                rows.append(sanitizer(row))
-        summaries.append(_write_rows(output_dir / target_name, columns, rows))
+        for source_rows in (secondary_rows, deferred_rows):
+            if len(rows) >= max_rows_per_file:
+                break
+            rows.extend(source_rows[: max_rows_per_file - len(rows)])
+        summaries.append(_write_rows(output_dir / target_name, columns, rows[:max_rows_per_file]))
     return tuple(summaries)
 
 

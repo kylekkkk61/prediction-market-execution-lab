@@ -169,6 +169,63 @@ def render_edge_and_spread(executions: pd.DataFrame, candidates: pd.DataFrame) -
         st.dataframe(table, width="stretch", hide_index=True)
 
 
+def render_ml_diagnostics(executions: pd.DataFrame) -> None:
+    """Render public-safe ML and fill-probability decision diagnostics."""
+    st.subheader("ML and fill-probability diagnostics")
+    if executions.empty:
+        st.info("No execution sample data available for ML diagnostics.")
+        return
+
+    required = {"ml_predicted_ev", "ml_passed", "fill_probability", "fill_prob_passed"}
+    available = required.intersection(executions.columns)
+    if not available:
+        st.info("No public-safe ML diagnostic fields are available in the current sample.")
+        return
+
+    ml_predicted_ev = pd.to_numeric(executions.get("ml_predicted_ev"), errors="coerce")
+    ml_min_ev = pd.to_numeric(executions.get("ml_min_ev"), errors="coerce")
+    fill_probability = pd.to_numeric(executions.get("fill_probability"), errors="coerce")
+    fill_prob_min = pd.to_numeric(executions.get("fill_prob_min_probability"), errors="coerce")
+
+    diagnostics = [
+        {"metric": "Rows with ML predicted EV", "value": int(ml_predicted_ev.notna().sum())},
+        {"metric": "Avg ML predicted EV", "value": format_number(ml_predicted_ev.mean(), digits=6)},
+        {"metric": "Avg ML min EV threshold", "value": format_number(ml_min_ev.mean(), digits=6)},
+        {"metric": "Rows with fill probability", "value": int(fill_probability.notna().sum())},
+        {"metric": "Avg fill probability", "value": format_number(fill_probability.mean(), digits=6)},
+        {"metric": "Avg fill-prob threshold", "value": format_number(fill_prob_min.mean(), digits=6)},
+    ]
+
+    if "ml_passed" in executions:
+        ml_passed = executions["ml_passed"].dropna().astype(str).str.lower().isin({"true", "1", "yes"})
+        diagnostics.append({"metric": "ML pass rate", "value": format_rate(ml_passed.mean())})
+    if "fill_prob_passed" in executions:
+        fill_passed = executions["fill_prob_passed"].dropna().astype(str).str.lower().isin({"true", "1", "yes"})
+        diagnostics.append({"metric": "Fill-probability pass rate", "value": format_rate(fill_passed.mean())})
+
+    diagnostics_frame = pd.DataFrame(diagnostics).astype(str)
+    st.dataframe(diagnostics_frame, width="stretch", hide_index=True)
+
+    columns = st.columns(2)
+    with columns[0]:
+        if "ml_reason" in executions:
+            reasons = executions["ml_reason"].fillna("none").value_counts().rename_axis("ml_reason")
+            st.caption("ML decision reasons")
+            st.bar_chart(reasons)
+            st.dataframe(reasons.reset_index(name="rows"), width="stretch", hide_index=True)
+    with columns[1]:
+        if "fill_prob_reason" in executions:
+            reasons = executions["fill_prob_reason"].fillna("none").value_counts().rename_axis("fill_prob_reason")
+            st.caption("Fill-probability decision reasons")
+            st.bar_chart(reasons)
+            st.dataframe(reasons.reset_index(name="rows"), width="stretch", hide_index=True)
+
+    st.caption(
+        "These diagnostics use scalar public-sample fields only. Model paths, raw feature JSON, "
+        "wallet/order identifiers, and raw responses are not exported."
+    )
+
+
 def render_calibration_and_risk() -> None:
     """Render existing calibration and risk figures."""
     st.subheader("Calibration and risk simulation")
@@ -302,6 +359,7 @@ def main() -> None:
     render_status_breakdown(executions)
     render_fill_rate_by_bucket(executions)
     render_edge_and_spread(executions, candidates)
+    render_ml_diagnostics(executions)
 
     st.header("Calibration and risk")
     render_calibration_and_risk()

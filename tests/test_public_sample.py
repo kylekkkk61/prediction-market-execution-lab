@@ -49,6 +49,19 @@ def test_generate_public_samples_filters_sensitive_fields(tmp_path: Path) -> Non
                 "signal_edge": "0.04",
                 "signal_ask": "0.57",
                 "signal_spread": "0.02",
+                "ml_filter_enabled": "True",
+                "ml_predicted_ev": "0.123456789",
+                "ml_min_ev": "0.5",
+                "ml_passed": "False",
+                "ml_reason": "predicted_ev_below_threshold",
+                "ml_model_path": "models/private-model.txt",
+                "ml_feature_values_json": "do-not-export",
+                "fill_probability": "0.42",
+                "fill_prob_min_probability": "0.75",
+                "fill_prob_passed": "False",
+                "fill_prob_reason": "predicted_ev_below_threshold",
+                "fill_prob_model_path": "models/private-fill-model.txt",
+                "fill_prob_feature_values_json": "do-not-export",
                 "token_id": "token-secret",
                 "raw_response": "do-not-export",
             }
@@ -65,6 +78,19 @@ def test_generate_public_samples_filters_sensitive_fields(tmp_path: Path) -> Non
                 "status": "filled",
                 "amount_usd": "123.45",
                 "fill_amount_usd": "50",
+                "ml_filter_enabled": "True",
+                "ml_predicted_ev": "0.3333333",
+                "ml_min_ev": "0.2",
+                "ml_passed": "True",
+                "ml_reason": "",
+                "ml_model_path": "models/private-model.txt",
+                "ml_feature_values_json": "do-not-export",
+                "fill_probability": "0.88",
+                "fill_prob_min_probability": "0.75",
+                "fill_prob_passed": "True",
+                "fill_prob_reason": "",
+                "fill_prob_model_path": "models/private-fill-model.txt",
+                "fill_prob_feature_values_json": "do-not-export",
                 "response_order_id": "order-secret",
                 "raw_response": "do-not-export",
             }
@@ -144,14 +170,26 @@ def test_generate_public_samples_filters_sensitive_fields(tmp_path: Path) -> Non
     candidates = _read_csv(output_dir / "candidates_sample.csv")
     assert candidates[0]["candidate_id"].startswith("candidate_")
     assert candidates[0]["market_slug"].startswith("slug_")
+    assert candidates[0]["ml_predicted_ev"] == "0.123457"
+    assert candidates[0]["ml_reason"] == "predicted_ev_below_threshold"
+    assert candidates[0]["fill_prob_min_probability"] == "0.75"
     assert "token_id" not in candidates[0]
     assert "raw_response" not in candidates[0]
+    assert "ml_model_path" not in candidates[0]
+    assert "ml_feature_values_json" not in candidates[0]
+    assert "fill_prob_model_path" not in candidates[0]
+    assert "fill_prob_feature_values_json" not in candidates[0]
     assert "btc-updown-secret-market" not in str(candidates[0])
 
     executions = _read_csv(output_dir / "executions_sample.csv")
     assert executions[0]["amount_bucket"] == "100_250"
     assert executions[0]["fill_amount_bucket"] == "50_100"
+    assert executions[0]["ml_predicted_ev"] == "0.333333"
+    assert executions[0]["ml_passed"] == "True"
+    assert executions[0]["fill_probability"] == "0.88"
     assert "response_order_id" not in executions[0]
+    assert "ml_model_path" not in executions[0]
+    assert "ml_feature_values_json" not in executions[0]
 
     ticks = _read_csv(output_dir / "tick_snapshots_sample.csv")
     assert ticks[0]["market_id"].startswith("market_")
