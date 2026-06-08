@@ -39,8 +39,8 @@ def blended_sigma(
 ) -> float:
     """Blend short- and long-window volatility estimates.
 
-    The blend follows the legacy replay logic: normalize the configured weights,
-    combine variances, and add a small variance floor.
+    The blend normalizes the configured weights, combines variances, and adds
+    a small variance floor.
     """
 
     cfg = config or FairProbabilityConfig()
@@ -70,8 +70,7 @@ def estimate_up_probability(
 ) -> float:
     """Estimate the fair probability that the reference price finishes above anchor.
 
-    This is a compact extraction of the replay model used in the legacy research
-    scripts. It is suitable for notebooks, reports, and dry-run analysis.
+    The estimate is suitable for notebooks, reports, and public replay analysis.
     """
 
     cfg = config or FairProbabilityConfig()

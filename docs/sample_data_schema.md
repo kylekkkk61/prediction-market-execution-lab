@@ -13,8 +13,11 @@ Each row represents one market snapshot for a binary short-horizon BTC predictio
 | `timestamp` | string | ISO-8601 timestamp for the snapshot. |
 | `market_id` | string | Anonymized market identifier. |
 | `market_slug` | string | Anonymized market slug. |
-| `current_price` | float | BTC reference price at the snapshot time. |
+| `current_price` | float | BTC reference price at the snapshot time. In the public sample this mirrors the Binance-style reference field when available. |
 | `open_anchor_price` | float | Market opening anchor used for UP/DOWN settlement logic. |
+| `bn_price` | float | Binance BTCUSDT-style reference price used as the high-frequency BTC proxy. |
+| `bn_open_price` | float | Binance-style opening anchor price when available. |
+| `pm_open_price` | float | Prediction-market opening reference price when available. |
 | `remaining_seconds` | float | Seconds remaining until market resolution. |
 | `yes_bid` / `yes_ask` | float | YES-side bid and ask probabilities. |
 | `down_bid` / `down_ask` | float | DOWN-side bid and ask probabilities. |

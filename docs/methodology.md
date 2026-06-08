@@ -13,13 +13,19 @@ The project distinguishes between:
 - model-estimated fair probabilities
 - realized settlement outcomes
 
-## 2. Fair Probability Model
+## 2. Reference Price Assumption
+
+The fair-probability workflow uses Binance BTCUSDT-style reference prices as a high-frequency proxy for BTC spot movement. The research motivation is that centralized exchange prices can update faster than prediction-market quotes and oracle- or settlement-linked reference mechanisms.
+
+This assumption is used to build fair probability and replay diagnostics. It should not be read as proof of a persistent lead-lag alpha unless a separate lead-lag study validates it.
+
+## 3. Fair Probability Model
 
 The fair probability model estimates the probability of a short-horizon BTC outcome using reference-market features and remaining time to expiry.
 
 The public implementation prioritizes clarity, reproducibility, and interpretability over strategy optimization.
 
-## 3. Edge Definition
+## 4. Edge Definition
 
 The project separates:
 
@@ -28,7 +34,7 @@ The project separates:
 
 This distinction is central to the project.
 
-## 4. Execution-Quality Analysis
+## 5. Execution-Quality Analysis
 
 Execution quality is evaluated using signal and execution-state funnels, such as:
 
@@ -43,13 +49,13 @@ candidate signal
 
 The public workflow uses anonymized sample data where private execution records would otherwise be required.
 
-## 5. Tick-Level Replay Backtesting
+## 6. Tick-Level Replay Backtesting
 
 Tick-level replay evaluates whether a signal would still be actionable when replayed against historical market snapshots.
 
 The goal is not to claim live performance, but to diagnose how market conditions affect signal viability.
 
-## 6. PnL Attribution
+## 7. PnL Attribution
 
 PnL attribution decomposes outcomes by research dimensions such as:
 
@@ -60,37 +66,35 @@ PnL attribution decomposes outcomes by research dimensions such as:
 - fill quality
 - side or market state
 
-## 7. Probability Calibration
+## 8. Probability Calibration
 
 Calibration diagnostics compare model-estimated probabilities and market-implied probabilities with realized settlement outcomes.
 
 The public report uses market-level joins over anonymized sample data and reports metrics such as Brier score, log loss, calibration buckets, and realized outcome rates.
 
-## 8. ML-Assisted Filtering
+## 9. ML-Assisted Filtering Workflow
 
-Machine learning is treated as an optional signal-quality diagnostic layer.
+Machine learning is treated as an optional signal-quality diagnostic layer, not as a black-box alpha engine.
 
-The project avoids treating ML as a black-box alpha engine. Any ML component should include validation notes and overfitting limitations.
-
-The public implementation uses anonymized sample execution records to demonstrate the validation workflow:
+The current public implementation does not ship or load a production ML model artifact. It uses anonymized sample execution records to demonstrate the validation workflow with a transparent learned-threshold baseline:
 
 ```text
 public sample executions
 → numeric feature extraction
 → chronological train/test split
-→ transparent baseline filter
+→ learned threshold baseline
 → pass/reject diagnostics
 ```
 
-This demo is not evidence of production predictive performance or trading profitability. Its purpose is to show how signal filtering can be structured, validated, and documented without leaking private strategy details.
+This demo is not evidence of production predictive performance or trading profitability. It also does not replay the original private ML model. A future extension can add true ML score and decision diagnostics, such as `ml_score`, `ml_passed`, or `blocked_ml_filter`, if those fields can be safely anonymized and bucketed from the private ledger.
 
-## 9. Risk Simulation
+## 10. Risk Simulation
 
 Monte Carlo and bootstrap-style simulations estimate drawdown, losing streaks, terminal PnL dispersion, and sensitivity to execution assumptions.
 
 The public report uses normalized sample PnL values, not real account-level PnL.
 
-## 10. Limitations
+## 11. Limitations
 
 The methodology always distinguishes between backtested, simulated, anonymized, and live-observed evidence.
 

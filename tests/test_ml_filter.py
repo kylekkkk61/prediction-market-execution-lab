@@ -78,9 +78,10 @@ def test_walk_forward_demo_and_report_render_on_public_sample():
 
     assert train.row_count > 0
     assert test.row_count > 0
-    assert "ML Filter Methodology Report" in report
+    assert "ML Filter Workflow Report" in report
     assert "does not establish production predictive performance" in report
     assert "chronological train/test split" in report
+    assert "does not replay the original private ML model" in report
 
 
 def test_fit_baseline_thresholds_handles_empty_examples():

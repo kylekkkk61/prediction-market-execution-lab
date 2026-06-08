@@ -40,6 +40,12 @@ The main distinction is between:
 - **Theoretical edge:** the difference between a fair probability estimate and a market-implied probability.
 - **Executable edge:** the portion of that edge that remains after execution frictions and settlement are incorporated.
 
+## What This Project Shows
+
+The public sample does not support a profitability claim. In the sample-backed reports, normalized settlement PnL is weak and slightly negative on average, while the positive normalized PnL rate is low. The core research takeaway is that apparent signal edge can be materially eroded by execution acceptance, fill probability, timing, spread, latency, and settlement outcomes.
+
+The value of the project is the diagnostic workflow: it separates theoretical pricing edge from executable edge, then makes the erosion visible through replay, execution-quality reports, probability calibration, risk simulation, and filter diagnostics.
+
 ## Why Prediction Markets
 
 Prediction-market prices can be interpreted as market-implied probabilities. That makes them a useful environment for studying the gap between estimated fair probability and executable trading outcomes.
@@ -53,6 +59,8 @@ Short-horizon BTC markets are useful for this project because they combine:
 - liquidity constraints that can materially change realized edge
 
 The project does not attempt to predict BTC direction as its primary claim. It studies whether apparent prediction-market mispricings remain actionable after microstructure and execution constraints are applied.
+
+The fair-probability workflow uses Binance BTCUSDT-style reference prices as a high-frequency proxy for BTC spot movement. The motivation is that centralized exchange prices can update faster than prediction-market quotes and oracle- or settlement-linked market references. This is treated as a research assumption and diagnostic input, not as proof of a persistent lead-lag alpha.
 
 ## Repository Structure
 
@@ -126,8 +134,8 @@ The public research workflow is organized around the following components.
 7. **Risk and Monte Carlo simulation**
    Use demonstration-only trade outcome samples to estimate drawdown, terminal PnL dispersion, and sensitivity to execution assumptions.
 
-8. **ML-assisted signal filtering**
-   Present ML as an optional signal-quality diagnostic layer. It is not framed as a guaranteed alpha model or standalone trading strategy.
+8. **ML-assisted signal filtering workflow**
+   Demonstrate a chronological train/test validation workflow with a transparent learned-threshold baseline. The public demo does not ship or load a production ML model artifact; true ML score/decision diagnostics are a planned extension if they can be safely anonymized from private ledger fields.
 
 See [`docs/methodology.md`](docs/methodology.md) for a fuller explanation.
 
