@@ -6,6 +6,7 @@ not connect to live markets, private ledgers, wallets, signers, or execution API
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pandas as pd
@@ -45,7 +46,7 @@ def format_number(value: float | int | None, digits: int = 4) -> str:
 def image_if_available(path: Path, caption: str) -> None:
     """Render an existing figure if it is present in the repository."""
     if path.exists():
-        st.image(str(path), caption=caption, use_container_width=True)
+        st.image(str(path), caption=caption, width="stretch")
     else:
         st.info(f"Figure not found: {path.relative_to(ROOT)}")
 
@@ -113,7 +114,7 @@ def render_status_breakdown(executions: pd.DataFrame) -> None:
     st.bar_chart(status_counts)
     st.dataframe(
         status_counts.reset_index(name="rows"),
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
     )
 
@@ -137,7 +138,7 @@ def render_fill_rate_by_bucket(executions: pd.DataFrame) -> None:
     st.bar_chart(grouped.set_index("time_bucket")["fill_rate_pct"])
     st.dataframe(
         grouped[["time_bucket", "rows", "fill_rate"]],
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
     )
 
@@ -165,7 +166,7 @@ def render_edge_and_spread(executions: pd.DataFrame, candidates: pd.DataFrame) -
     if diagnostics:
         table = pd.DataFrame(diagnostics)
         table["value"] = table["value"].map(lambda value: format_number(value))
-        st.dataframe(table, use_container_width=True, hide_index=True)
+        st.dataframe(table, width="stretch", hide_index=True)
 
 
 def render_calibration_and_risk() -> None:
@@ -189,6 +190,35 @@ def load_report_text(filename: str) -> str:
     return path.read_text(encoding="utf-8")
 
 
+REPORT_IMAGE_PATTERN = re.compile(r"^!\[(?P<caption>[^\]]*)\]\((?P<path>[^)]+)\)\s*$")
+
+
+def render_report_markdown_preview(text: str, max_chars: int = 4000) -> None:
+    """Render report markdown previews and resolve report-relative images."""
+    preview = text[:max_chars]
+    markdown_buffer: list[str] = []
+
+    def flush_markdown() -> None:
+        if markdown_buffer:
+            st.markdown("\n".join(markdown_buffer))
+            markdown_buffer.clear()
+
+    for line in preview.splitlines():
+        match = REPORT_IMAGE_PATTERN.match(line.strip())
+        if not match:
+            markdown_buffer.append(line)
+            continue
+
+        flush_markdown()
+        image_path = REPORTS_DIR / match.group("path")
+        caption = match.group("caption") or image_path.name
+        image_if_available(image_path, caption)
+
+    flush_markdown()
+    if len(text) > max_chars:
+        st.caption("Preview truncated in dashboard. See the full markdown report in reports/.")
+
+
 def render_report_links() -> None:
     """Render compact report previews for the demo dashboard."""
     st.subheader("Generated report artifacts")
@@ -202,9 +232,7 @@ def render_report_links() -> None:
         text = load_report_text(report)
         with st.expander(report):
             if text:
-                st.markdown(text[:4000])
-                if len(text) > 4000:
-                    st.caption("Preview truncated in dashboard. See the full markdown report in reports/.")
+                render_report_markdown_preview(text)
             else:
                 st.info(f"Report not found: reports/{report}")
 
@@ -229,7 +257,7 @@ def render_sample_tables(
                 st.info("No rows available.")
             else:
                 st.caption(f"Rows: {len(frame):,}; Columns: {len(frame.columns):,}")
-                st.dataframe(frame.head(50), use_container_width=True, hide_index=True)
+                st.dataframe(frame.head(50), width="stretch", hide_index=True)
 
 
 def main() -> None:
