@@ -2,65 +2,203 @@
 
 **Testing Executable Edge in Polymarket BTC Short-Horizon Markets**
 
-Prediction Market Execution Lab is a public FinTech research project for studying prediction-market microstructure, fair probability modeling, and execution quality.
+[![Python](https://img.shields.io/badge/python-3.11%2B-blue?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![uv](https://img.shields.io/badge/env-uv-4B32C3?style=flat-square)](https://github.com/astral-sh/uv)
+[![pytest](https://img.shields.io/badge/tests-pytest-green?style=flat-square)](https://docs.pytest.org/)
+[![Ruff](https://img.shields.io/badge/lint-ruff-261230?style=flat-square)](https://docs.astral.sh/ruff/)
+[![Streamlit](https://img.shields.io/badge/dashboard-Streamlit-FF4B4B?style=flat-square&logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![Status](https://img.shields.io/badge/status-research%20demo-lightgrey?style=flat-square)](#)
 
-It uses Polymarket BTC short-horizon markets as a case study to ask whether apparent pricing edges can survive real-world execution frictions. The repository is a research lab, not a live trading bot, production execution system, or profitable strategy claim.
+Prediction Market Execution Lab is a public FinTech / market microstructure research project that studies whether apparent prediction-market pricing edge can survive spread, fill probability, latency, order failure, model gates, and settlement outcomes.
 
-## Project Overview
+This repository is **not** a trading bot, production execution system, or profitable strategy claim. It is a research portfolio project built around executable-edge analysis in Polymarket BTC short-horizon markets.
 
-Short-horizon prediction markets often move quickly around reference-market prices, liquidity conditions, and settlement boundaries. A contract may look mispriced when compared with a fair probability estimate, but that apparent edge can disappear after accounting for:
+<div align="center">
+  <img src="reports/figures/signal_funnel.png" alt="Signal funnel" width="780">
+</div>
 
-- bid-ask spread
-- available liquidity and slippage
-- fill probability
-- latency and quote staleness
-- position limits
-- settlement outcomes
-- post-trade PnL attribution
+## TL;DR
 
-This project converts that problem into a reproducible public workflow:
+- **What I tested:** whether short-horizon Polymarket BTC pricing edge remains tradable after execution frictions.
+- **What I found:** the public sample does not support a profitability claim; the strategy did not yet convert theoretical edge into reliable realized PnL.
+- **Why it matters:** pure tick replay and simulated backtests can show positive edge, but live-like execution records become much weaker once failed order submission, latency, quote staleness, fill probability, model gates, and settlement outcomes are included.
+- **Core contribution:** a public-safe research workflow for separating theoretical edge from executable edge.
 
-```text
-public sample data
-→ fair probability and implied probability analysis
-→ candidate edge calculation
-→ tick-level replay and execution-quality diagnostics
-→ sample-backed reports and figures
-→ risk simulation and ML-assisted filtering demos
-```
+## Key Findings
 
-The repository includes public-safe modules, sample datasets, report scripts, notebooks, generated figures, and a lightweight dashboard. The outputs are demonstration artifacts based on anonymized, downsampled, and normalized public samples. They are not full empirical performance claims.
+1. **Simulation-to-live gap is the central problem.**  
+   Pure tick replay can show positive edge, but live-like ledger records gave a different answer after order-submission failure, latency, quote staleness, fill probability, model gates, and settlement outcomes were included.
+
+2. **The bottleneck is the execution funnel, not only spread.**  
+   Spread matters, but the larger issue is whether a signal survives acceptance, fill probability, ML EV filtering, order submission, and settlement.
+
+3. **Extreme probability buckets are fragile.**  
+   Very low and very high probability buckets are less stable in the public sample, especially around the final resolution window where small price changes can cause large binary-outcome errors.
+
+4. **ML is an execution-quality gate, not a magic alpha model.**  
+   The private workflow uses ML EV and fill-probability gates to improve candidate quality after edge detection. The public demo exports only safe scalar diagnostics and does not ship model artifacts or raw feature JSON.
+
+5. **Risk is sparse and path-dependent.**  
+   The public sample looks zero-inflated rather than like smooth edge capture: many markets produce no positive normalized PnL because the strategy often does not form a matched position.
+
+## Explore the Project
+
+| Artifact | Description |
+|---|---|
+| [`dashboard/app.py`](dashboard/app.py) | Streamlit dashboard for public-sample execution diagnostics. |
+| [`reports/execution_quality_report.md`](reports/execution_quality_report.md) | Signal funnel, rejection reasons, edge before/after execution, settlement PnL, author takeaways. |
+| [`reports/probability_calibration_report.md`](reports/probability_calibration_report.md) | Fair probability vs market-implied calibration, tail-bucket instability, Binance reference-price assumption. |
+| [`reports/ml_filter_report.md`](reports/ml_filter_report.md) | ML EV gate, fill-probability diagnostics, walk-forward validation, overfitting limitations. |
+| [`reports/risk_simulation_report.md`](reports/risk_simulation_report.md) | Monte Carlo terminal PnL, drawdown, losing-streak, and path-dependency diagnostics. |
+| [`notebooks/`](notebooks/) | Public-sample data overview and execution-quality analysis notebooks. |
+| [`docs/methodology.md`](docs/methodology.md) | Methodology details, fair probability formula, reference-price assumptions, gate sequence. |
+| [`docs/limitations.md`](docs/limitations.md) | Scope limits, replay/live gap, reference-lag assumption, ML/filter caveats. |
+
+## Visual Summary
+
+<table align="center">
+  <tr>
+    <td align="center">
+      <img src="reports/figures/signal_funnel.png" alt="Signal funnel" width="360"><br>
+      <em>Execution funnel: where theoretical edge is lost before filled exposure.</em>
+    </td>
+    <td align="center">
+      <img src="reports/figures/execution_status_breakdown.png" alt="Execution status breakdown" width="360"><br>
+      <em>Status breakdown: how public-sample attempts split across execution states.</em>
+    </td>
+  </tr>
+</table>
 
 ## Research Question
 
 > Can apparent short-horizon prediction-market pricing edges survive real execution frictions such as bid-ask spread, slippage, fill probability, latency, position limits, and settlement outcomes?
 
-The main distinction is between:
+The project separates two concepts:
 
 - **Theoretical edge:** the difference between a fair probability estimate and a market-implied probability.
-- **Executable edge:** the portion of that edge that remains after execution frictions and settlement are incorporated.
-
-## What This Project Shows
-
-The public sample does not support a profitability claim. My conclusion from this sample is that the strategy did not yet convert theoretical edge into reliable realized PnL. Normalized settlement PnL is weak and slightly negative on average, while the positive normalized PnL rate is low.
-
-The more interesting finding is where the edge disappeared. Pure tick replay and simulated backtests can show positive edge, but live-like execution records gave a different answer once failed order submission, latency, quote staleness, API variability, fill probability, model gates, and settlement outcomes were included. The value of the project is the diagnostic workflow: it separates theoretical pricing edge from executable edge, then makes the simulation-to-live gap visible through replay, execution-quality reports, probability calibration, risk simulation, and filter diagnostics.
+- **Executable edge:** the portion of that edge that remains after execution frictions and settlement outcomes are incorporated.
 
 ## Why Prediction Markets
 
-Prediction-market prices can be interpreted as market-implied probabilities. That makes them a useful environment for studying the gap between estimated fair probability and executable trading outcomes.
+Prediction-market prices can be interpreted as market-implied probabilities. That makes them useful for studying the gap between estimated fair probability and executable trading outcomes.
 
-Short-horizon BTC markets are useful for this project because they combine:
+Short-horizon BTC markets are especially useful because they combine:
 
 - rapidly changing reference prices
-- discrete settlement outcomes
+- discrete binary settlement outcomes
 - CLOB-style bid-ask dynamics
-- time-to-expiry effects
-- liquidity constraints that can materially change realized edge
-
-The project does not attempt to predict BTC direction as its primary claim. It studies whether apparent prediction-market mispricings remain actionable after microstructure and execution constraints are applied.
+- time-to-resolution effects
+- liquidity and fill constraints
+- final-window reversal risk
 
 The fair-probability workflow uses Binance BTCUSDT spot ticks as the faster reference layer and Binance-derived bucket open prices as the opening-anchor proxy. Polymarket BTC markets settle against an oracle-style reference rather than Binance directly. My working assumption, consistent with common player observations in these markets, is that the resolution-linked reference tends to follow Binance-style spot movement with a short delay. This repository does not yet include a dedicated lead-lag validation study, so the lag is treated as a domain-informed assumption rather than a proven empirical claim.
+
+## Methodology Snapshot
+
+```text
+public sample data
+→ fair probability and market-implied probability analysis
+→ candidate edge calculation
+→ tick replay and execution-quality diagnostics
+→ ML EV / fill-probability gate diagnostics
+→ sample-backed reports and figures
+→ Monte Carlo risk simulation
+→ Streamlit dashboard
+```
+
+Main components:
+
+- **Fair probability modeling:** estimate outcome probability from Binance-style reference price movement, volatility, and time to resolution.
+- **Executable edge calculation:** adjust apparent edge for spread, slippage, fill probability, and execution assumptions.
+- **Tick-level replay:** test whether signals remain actionable under historical quote snapshots.
+- **Execution-quality diagnostics:** analyze candidate signals, rejected signals, fills, latency, edge decay, and settlement outcomes.
+- **Probability calibration:** compare fair and market-implied probabilities with realized outcomes.
+- **ML-assisted filtering workflow:** evaluate public-safe ML EV and fill-probability diagnostics without exposing model artifacts.
+- **Risk simulation:** bootstrap normalized public-sample outcomes to inspect terminal PnL, drawdown, and path dependency.
+
+See [`docs/methodology.md`](docs/methodology.md) for the full methodology.
+
+## Tech Stack
+
+| Area | Tools / Methods |
+|---|---|
+| Language | Python 3.11+ |
+| Environment | `uv`, `pyproject.toml`, `uv.lock` |
+| Data workflow | pandas, NumPy, public-safe anonymized CSV samples |
+| Probability modeling | fair probability model, implied probability handling, calibration diagnostics |
+| Backtesting | tick-level replay, execution-quality simulation |
+| ML diagnostics | public-safe ML EV gate, fill-probability gate, chronological validation workflow |
+| Risk | Monte Carlo / bootstrap simulation, drawdown and losing-streak diagnostics |
+| Visualization | matplotlib report figures, Streamlit dashboard |
+| Quality | pytest, ruff |
+
+## Data and Sample Policy
+
+Private raw ledger data, raw tick snapshots, wallet identifiers, order IDs, signer logic, allowance logic, deployment details, live execution runbooks, raw model artifacts, and feature JSON are intentionally excluded from the public workflow.
+
+Public sample files under [`data/sample/`](data/sample/) are:
+
+- anonymized
+- downsampled
+- normalized where needed
+- small enough for review and deterministic demo runs
+- intended for reproducible demonstrations, not full historical analysis
+
+Public sample files:
+
+```text
+data/sample/candidates_sample.csv
+data/sample/executions_sample.csv
+data/sample/rejections_sample.csv
+data/sample/settlements_sample.csv
+data/sample/tick_snapshots_sample.csv
+```
+
+The sample-generation policy is documented in [`docs/data_preparation.md`](docs/data_preparation.md), and the sample schema is documented in [`docs/sample_data_schema.md`](docs/sample_data_schema.md).
+
+## Quickstart
+
+Install the environment, run tests, and launch the public-sample dashboard:
+
+```bash
+uv sync --extra dev --extra notebook --extra dashboard --extra ml
+PYTHONPATH=src uv run pytest
+PYTHONPATH=src uv run streamlit run dashboard/app.py
+```
+
+The dashboard reads only public sample files and generated report artifacts from the repository. It does not connect to live markets, private ledgers, wallets, signers, or execution APIs.
+
+<details>
+<summary>Regenerate reports and figures</summary>
+
+```bash
+PYTHONPATH=src uv run python scripts/run_execution_quality_report.py
+PYTHONPATH=src uv run python scripts/run_probability_calibration_report.py
+PYTHONPATH=src uv run python scripts/run_monte_carlo_simulation.py
+PYTHONPATH=src uv run python scripts/run_ml_filter_demo.py
+PYTHONPATH=src uv run python scripts/generate_report_figures.py
+```
+
+</details>
+
+<details>
+<summary>Run optional demos and local sample preparation</summary>
+
+Optional tick replay demo:
+
+```bash
+PYTHONPATH=src uv run python scripts/run_tick_replay_backtest.py
+```
+
+Optional public sample regeneration from local private inputs:
+
+```bash
+PYTHONPATH=src uv run python scripts/prepare_public_sample_data.py
+```
+
+Sample regeneration requires local private raw inputs that are excluded from the repository. Do not commit files under `private/`.
+
+</details>
 
 ## Repository Structure
 
@@ -83,127 +221,6 @@ prediction-market-execution-lab/
 └── uv.lock                       # Locked environment
 ```
 
-The public demo entry points live under `scripts/`, `src/`, `notebooks/`, `reports/`, and `dashboard/`.
-
-## Data and Sample Policy
-
-Private raw ledger data, raw tick snapshots, wallet identifiers, order IDs, signer logic, allowance logic, deployment details, and live execution runbooks are intentionally excluded from the public workflow.
-
-The public sample files under `data/sample/` are:
-
-- anonymized
-- downsampled
-- normalized where needed
-- small enough for review and deterministic demo runs
-- intended for reproducible demonstrations, not full historical analysis
-
-Public sample files:
-
-```text
-data/sample/candidates_sample.csv
-data/sample/executions_sample.csv
-data/sample/rejections_sample.csv
-data/sample/settlements_sample.csv
-data/sample/tick_snapshots_sample.csv
-```
-
-The sample-generation policy is documented in [`docs/data_preparation.md`](docs/data_preparation.md), and the sample schema is documented in [`docs/sample_data_schema.md`](docs/sample_data_schema.md).
-
-## Methodology Summary
-
-The public research workflow is organized around the following components.
-
-1. **Fair probability modeling**
-   Estimate a fair probability for short-horizon BTC outcome markets using reference-market features and time-to-expiry inputs.
-
-2. **Market-implied probability handling**
-   Convert prediction-market prices into implied probabilities while preserving the distinction between bid, ask, midpoint, and executable price assumptions.
-
-3. **Executable edge calculation**
-   Compare fair probability with market-implied probability, then apply execution frictions such as spread, slippage, and fill assumptions.
-
-4. **Tick-level replay backtesting**
-   Replay public sample tick snapshots to test whether candidate signals would remain actionable under time, quote, and liquidity constraints.
-
-5. **Execution-quality diagnostics**
-   Analyze candidate signals, research-filter pass rates, attempted fills, realized fills, rejected signals, spread distribution, fill-rate buckets, and settlement outcomes.
-
-6. **Probability calibration**
-   Compare fair probabilities and market-implied probabilities with realized sample settlement outcomes using calibration-style diagnostics.
-
-7. **Risk and Monte Carlo simulation**
-   Use demonstration-only trade outcome samples to estimate drawdown, terminal PnL dispersion, and sensitivity to execution assumptions.
-
-8. **ML-assisted signal filtering workflow**
-   Demonstrate a chronological train/test validation workflow with a transparent learned-threshold baseline, plus public-safe scalar ML and fill-probability diagnostics exported from the private ledger. The public demo does not ship or load a production ML model artifact and does not expose model paths, raw feature JSON, wallet identifiers, order IDs, or raw responses.
-
-See [`docs/methodology.md`](docs/methodology.md) for a fuller explanation.
-
-## Reports and Figures
-
-The repository includes sample-backed demonstration reports:
-
-```text
-reports/execution_quality_report.md
-reports/probability_calibration_report.md
-reports/risk_simulation_report.md
-reports/ml_filter_report.md
-```
-
-Generated figures are stored in:
-
-```text
-reports/figures/
-```
-
-Figure outputs include signal funnel, spread distribution, fill-rate buckets, calibration curve, and Monte Carlo risk visualizations. These are demonstration outputs generated from public sample data. They should not be read as complete historical performance results or production strategy validation.
-
-## How to Run Demo Using uv
-
-Install the environment:
-
-```bash
-uv sync --extra dev --extra notebook --extra dashboard --extra ml
-```
-
-Run the test suite:
-
-```bash
-PYTHONPATH=src uv run pytest
-```
-
-Run the public demo scripts:
-
-```bash
-PYTHONPATH=src uv run python scripts/run_execution_quality_report.py
-PYTHONPATH=src uv run python scripts/run_probability_calibration_report.py
-PYTHONPATH=src uv run python scripts/run_monte_carlo_simulation.py
-PYTHONPATH=src uv run python scripts/run_ml_filter_demo.py
-PYTHONPATH=src uv run python scripts/generate_report_figures.py
-```
-
-Optional tick replay demo:
-
-```bash
-PYTHONPATH=src uv run python scripts/run_tick_replay_backtest.py
-```
-
-Optional Streamlit dashboard:
-
-```bash
-PYTHONPATH=src uv run streamlit run dashboard/app.py
-```
-
-The dashboard reads only public sample files and generated report artifacts from the repository. It does not connect to live markets, private ledgers, wallets, signers, or execution APIs.
-
-Optional public sample regeneration from local private inputs:
-
-```bash
-PYTHONPATH=src uv run python scripts/prepare_public_sample_data.py
-```
-
-This command requires local private raw inputs that are excluded from the repository. Do not commit files under `private/`.
-
 ## Limitations
 
 This repository is designed for transparent research demonstration. Important limitations include:
@@ -212,7 +229,7 @@ This repository is designed for transparent research demonstration. Important li
 - Demonstration reports do not represent complete historical empirical performance.
 - Backtests and tick replays are not equivalent to live execution.
 - Fill assumptions may differ from actual venue behavior.
-- Latency, quote staleness, and market-depth changes can materially alter realized outcomes.
+- Latency, quote staleness, market-depth changes, and order-submission failure can materially alter realized outcomes.
 - ML-assisted filtering can overfit and must be validated out of sample before any serious use.
 - The project does not include wallet operations, signer logic, live taker execution, allowance maintenance, auto-claim logic, or production deployment instructions.
 
