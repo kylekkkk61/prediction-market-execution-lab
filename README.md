@@ -70,7 +70,7 @@ prediction-market-execution-lab/
 │   ├── risk/                     # Monte Carlo risk simulation
 │   └── utils/                    # Anonymization and shared utilities
 ├── tests/                        # Unit tests for public-safe modules and scripts
-├── dashboard/                    # Streamlit demo placeholder
+├── dashboard/                    # Streamlit public-sample demo dashboard
 ├── pyproject.toml                # Canonical dependency declaration
 └── uv.lock                       # Locked uv environment
 ```
@@ -154,10 +154,10 @@ Current figure outputs include signal funnel, spread distribution, fill-rate buc
 
 This project uses `uv` as the canonical environment and command runner. Dependencies are declared in `pyproject.toml` and locked in `uv.lock`. The repository intentionally does not maintain a `requirements.txt` workflow.
 
-Set up the environment with demo and testing extras:
+Set up the environment with demo, testing, notebook, dashboard, and ML extras:
 
 ```bash
-uv sync --extra dev --extra ml
+uv sync --extra dev --extra notebook --extra dashboard --extra ml
 ```
 
 Run the test suite:
@@ -181,6 +181,14 @@ Optional tick replay demo:
 ```bash
 PYTHONPATH=src uv run python scripts/run_tick_replay_backtest.py
 ```
+
+Optional Streamlit dashboard:
+
+```bash
+PYTHONPATH=src uv run streamlit run dashboard/app.py
+```
+
+The dashboard reads only public sample files and generated report artifacts from the repository. It does not connect to live markets, private ledgers, wallets, signers, or execution APIs.
 
 Optional public sample regeneration from local private inputs:
 
