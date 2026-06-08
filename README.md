@@ -2,9 +2,9 @@
 
 **Testing Executable Edge in Polymarket BTC Short-Horizon Markets**
 
-Prediction Market Execution Lab is a public research-oriented FinTech project for studying prediction-market microstructure, fair probability modeling, and execution quality.
+Prediction Market Execution Lab is a public FinTech research project for studying prediction-market microstructure, fair probability modeling, and execution quality.
 
-It uses Polymarket BTC short-horizon markets as a case study to ask whether apparent pricing edges can survive real-world execution frictions. The repository is intentionally framed as a research lab, not as a live trading bot, production execution system, or profitable strategy claim.
+It uses Polymarket BTC short-horizon markets as a case study to ask whether apparent pricing edges can survive real-world execution frictions. The repository is a research lab, not a live trading bot, production execution system, or profitable strategy claim.
 
 ## Project Overview
 
@@ -29,7 +29,7 @@ public sample data
 → risk simulation and ML-assisted filtering demos
 ```
 
-The current public repository includes demo-safe modules, sample datasets, report scripts, and generated figures. These outputs are demonstration artifacts based on anonymized, downsampled, and normalized public samples. They are not full empirical performance claims.
+The repository includes public-safe modules, sample datasets, report scripts, notebooks, generated figures, and a lightweight dashboard. The outputs are demonstration artifacts based on anonymized, downsampled, and normalized public samples. They are not full empirical performance claims.
 
 ## Research Question
 
@@ -44,7 +44,7 @@ The main distinction is between:
 
 Prediction-market prices can be interpreted as market-implied probabilities. That makes them a useful environment for studying the gap between estimated fair probability and executable trading outcomes.
 
-Short-horizon BTC markets are especially useful for this project because they combine:
+Short-horizon BTC markets are useful for this project because they combine:
 
 - rapidly changing reference prices
 - discrete settlement outcomes
@@ -64,18 +64,18 @@ prediction-market-execution-lab/
 ├── scripts/                      # Demo-safe report, figure, sample, and simulation runners
 ├── src/                          # Public research modules
 │   ├── backtesting/              # Tick-level replay logic
-│   ├── data_sources/             # Public sample loading and private inspection helpers
+│   ├── data_sources/             # Public sample loading and private-inspection helpers
 │   ├── execution_quality/        # Edge and fill-quality calculations
 │   ├── models/                   # Fair probability, calibration, and ML-filter demos
 │   ├── risk/                     # Monte Carlo risk simulation
 │   └── utils/                    # Anonymization and shared utilities
 ├── tests/                        # Unit tests for public-safe modules and scripts
 ├── dashboard/                    # Streamlit public-sample demo dashboard
-├── pyproject.toml                # Canonical dependency declaration
-└── uv.lock                       # Locked uv environment
+├── pyproject.toml                # Project metadata and dependencies
+└── uv.lock                       # Locked environment
 ```
 
-Root-level legacy research scripts and tracked private model artifacts have been removed from the public demo surface. Public entry points live under `scripts/`, `src/`, `notebooks/`, `reports/`, and `dashboard/`.
+The public demo entry points live under `scripts/`, `src/`, `notebooks/`, `reports/`, and `dashboard/`.
 
 ## Data and Sample Policy
 
@@ -89,7 +89,7 @@ The public sample files under `data/sample/` are:
 - small enough for review and deterministic demo runs
 - intended for reproducible demonstrations, not full historical analysis
 
-Current public sample files:
+Public sample files:
 
 ```text
 data/sample/candidates_sample.csv
@@ -118,7 +118,7 @@ The public research workflow is organized around the following components.
    Replay public sample tick snapshots to test whether candidate signals would remain actionable under time, quote, and liquidity constraints.
 
 5. **Execution-quality diagnostics**
-   Analyze candidate signals, risk-gate filtering, attempted fills, realized fills, rejected signals, spread distribution, fill-rate buckets, and settlement outcomes.
+   Analyze candidate signals, research-filter pass rates, attempted fills, realized fills, rejected signals, spread distribution, fill-rate buckets, and settlement outcomes.
 
 6. **Probability calibration**
    Compare fair probabilities and market-implied probabilities with realized sample settlement outcomes using calibration-style diagnostics.
@@ -148,13 +148,11 @@ Generated figures are stored in:
 reports/figures/
 ```
 
-Current figure outputs include signal funnel, spread distribution, fill-rate buckets, calibration curve, and Monte Carlo risk visualizations. These are demonstration outputs generated from public sample data. They should not be read as complete historical performance results or production strategy validation.
+Figure outputs include signal funnel, spread distribution, fill-rate buckets, calibration curve, and Monte Carlo risk visualizations. These are demonstration outputs generated from public sample data. They should not be read as complete historical performance results or production strategy validation.
 
 ## How to Run Demo Using uv
 
-This project uses `uv` as the canonical environment and command runner. Dependencies are declared in `pyproject.toml` and locked in `uv.lock`. The repository intentionally does not maintain a `requirements.txt` workflow.
-
-Set up the environment with demo, testing, notebook, dashboard, and ML extras:
+Install the environment:
 
 ```bash
 uv sync --extra dev --extra notebook --extra dashboard --extra ml

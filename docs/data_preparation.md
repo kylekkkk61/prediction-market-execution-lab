@@ -1,10 +1,12 @@
-# Data Preparation Plan
+# Data Preparation
 
-This document defines how private raw ledger and tick data should be inspected, anonymized, and converted into public-safe sample data for the Prediction Market Execution Lab.
+This document explains how private raw ledger and tick data are converted into public-safe sample data for Prediction Market Execution Lab.
 
 ## Purpose
 
-The project now has local private raw data that can improve the realism of the public research workflow:
+The public repository should be reproducible without exposing raw trading records or operational details. Private raw files are local-only inputs used to generate small, anonymized sample datasets and aggregate reports.
+
+Expected local private input layout:
 
 ```text
 private/raw_data/
@@ -12,28 +14,21 @@ private/raw_data/
 └── tick_snapshots/
 ```
 
-The public repo should not expose the raw data. Instead, raw files are local-only inputs used to generate small, anonymized sample datasets and aggregate reports.
+The `private/` directory is ignored by Git and must remain outside the public repository.
 
-## Available private inputs
+## Private Inputs
 
-### Full ledger export
+### Ledger export
 
-Location:
+Expected local path:
 
 ```text
 private/raw_data/ledger/
 ```
 
-Expected contents may include:
+A private ledger may contain order history, candidate signals, execution attempts, signal rejections, settlement records, logs, or runtime state files.
 
-- order history
-- raw candidate signals
-- execution attempts
-- signal rejections
-- market settlements
-- bot logs or runtime state files
-
-The full ledger is useful for:
+These inputs can support:
 
 - signal funnel analysis
 - rejection reason breakdown
@@ -42,21 +37,15 @@ The full ledger is useful for:
 - settlement and PnL attribution
 - risk and drawdown simulation
 
-### Seven days of tick snapshots
+### Tick snapshots
 
-Location:
+Expected local path:
 
 ```text
 private/raw_data/tick_snapshots/
 ```
 
-Current window:
-
-```text
-2026-05-29 through 2026-06-04
-```
-
-The tick snapshots are useful for:
+Tick snapshots can support:
 
 - tick-level replay
 - quote completeness checks
@@ -65,7 +54,7 @@ The tick snapshots are useful for:
 - fair probability versus market-implied probability analysis
 - edge decay diagnostics
 
-## Private data rules
+## Private Data Rules
 
 Raw private data must never be committed.
 
@@ -84,17 +73,15 @@ Do not commit:
 - private model artifacts
 - strategy-sensitive thresholds
 
-The `.gitignore` file must continue to exclude `private/`.
+## Public Sample Data
 
-## Public sample data target
-
-Public-safe sample data should eventually be written to:
+Public-safe sample data lives under:
 
 ```text
 data/sample/
 ```
 
-Target public sample files:
+Public sample files:
 
 ```text
 data/sample/tick_snapshots_sample.csv
@@ -104,9 +91,9 @@ data/sample/rejections_sample.csv
 data/sample/settlements_sample.csv
 ```
 
-These files should be small, reviewable, and safe to publish.
+These files are small, reviewable, and safe to publish. They are built for reproducible demonstrations rather than full historical analysis.
 
-## Anonymization rules
+## Anonymization Rules
 
 ### Identifiers
 
@@ -139,131 +126,32 @@ Remove or simplify:
 - exact live thresholds
 - full feature JSON dumps
 - model paths
-- exact model version details when not needed
+- model artifacts
 - raw configuration snapshots
 
 ### Tick data
 
-Tick samples should be downsampled.
+Tick samples should be downsampled to a small number of representative markets and rows. The goal is to demonstrate replay and quote-diagnostics workflows without exposing the full private dataset.
 
-Recommended public sample size:
+## Public Sample Generation
 
-- a small number of markets
-- a small number of rows per market
-- enough rows to demonstrate tick replay behavior
-- not enough rows to reconstruct the full private dataset
+The sample generation script reads local private inputs, applies anonymization and filtering rules, and writes public-safe samples to `data/sample/`.
 
-## Processing stages
-
-### Stage 1 — inspection only
-
-Goal:
-
-- inspect raw schema locally
-- summarize row counts, columns, time ranges, market counts, and status categories
-- identify sensitive fields
-
-Output:
-
-- console summaries
-- optional documentation updates
-- no raw rows committed
-
-### Stage 2 — anonymized sample generation
-
-Goal:
-
-- generate CSV samples in `data/sample/` from the full private ledger and seven days of tick snapshots
-- preserve enough structure for tick replay, execution-quality reporting, and notebook demos
-- remove or transform sensitive fields
-- keep samples small enough for GitHub review and deterministic test runs
-
-Current public default:
+Usage:
 
 ```bash
 PYTHONPATH=src uv run python scripts/prepare_public_sample_data.py
 ```
 
-Default limits:
+Useful size controls:
 
 ```text
---max-tick-files 7
---max-tick-rows-per-file 1500
---max-ledger-rows-per-file 1000
+--max-tick-files
+--max-tick-rows-per-file
+--max-ledger-rows-per-file
 ```
 
-Expected public outputs:
-
-```text
-data/sample/candidates_sample.csv
-data/sample/executions_sample.csv
-data/sample/rejections_sample.csv
-data/sample/settlements_sample.csv
-data/sample/tick_snapshots_sample.csv
-```
-
-Output:
-
-- public-safe sample CSV files
-- tests proving samples can be loaded
-- docs explaining that samples are anonymized and filtered
-
-### Stage 3 — report integration
-
-Goal:
-
-- run execution-quality reports against public sample data
-- generate figures from sample data
-- clearly label sample-backed results as sample-only
-
-Output:
-
-- `reports/execution_quality_report.md`
-- optional figures under `reports/figures/`
-- scripts that can be run without private data
-
-## Planned tooling
-
-### Inspection utilities
-
-Planned scripts:
-
-```text
-scripts/inspect_private_ledger.py
-scripts/inspect_private_ticks.py
-```
-
-These scripts should:
-
-- read from `private/raw_data/ledger/` and `private/raw_data/tick_snapshots/`
-- print aggregate summaries only
-- avoid writing public files by default
-- avoid printing sensitive values
-
-Usage:
-
-```bash
-PYTHONPATH=src uv run python scripts/inspect_private_ledger.py
-PYTHONPATH=src uv run python scripts/inspect_private_ticks.py --max-rows-per-file 1000
-```
-
-### Sample generation utilities
-
-Implemented script:
-
-```text
-scripts/prepare_public_sample_data.py
-```
-
-This script:
-
-- reads private raw inputs locally
-- applies anonymization and filtering rules
-- writes public-safe samples to `data/sample/`
-- is deterministic where practical
-- avoids requiring live execution credentials
-
-Usage:
+Example:
 
 ```bash
 PYTHONPATH=src uv run python scripts/prepare_public_sample_data.py \
@@ -272,37 +160,29 @@ PYTHONPATH=src uv run python scripts/prepare_public_sample_data.py \
   --max-ledger-rows-per-file 100
 ```
 
-Default output files:
+## Private Schema Inspection
 
-```text
-data/sample/candidates_sample.csv
-data/sample/executions_sample.csv
-data/sample/rejections_sample.csv
-data/sample/settlements_sample.csv
-data/sample/tick_snapshots_sample.csv
-```
+Private inspection utilities are local-only helpers for understanding raw data shape without printing or committing sensitive rows.
 
-The generated files should remain small enough for public review. Larger empirical analysis should stay local or be summarized in aggregate reports.
-
-## Validation requirements
-
-Before committing generated sample files:
-
-1. Confirm `private/` is ignored by git.
-2. Confirm `git status` does not show raw private files.
-3. Inspect sample files for sensitive columns.
-4. Run tests using `uv`:
+Usage:
 
 ```bash
-PYTHONPATH=src uv run pytest
+PYTHONPATH=src uv run python scripts/inspect_private_ledger.py
+PYTHONPATH=src uv run python scripts/inspect_private_ticks.py --max-rows-per-file 1000
 ```
 
-5. Run relevant demo scripts against `data/sample/`.
+These scripts print aggregate summaries only and should not be used to publish raw data.
 
-## Documentation rule
+## Report Integration
 
-Any report, notebook, or README section using public samples must state that:
+Public reports and figures should run from `data/sample/`:
 
-- the data is anonymized and filtered
-- the samples are for reproducibility and demonstration
-- sample outputs should not be interpreted as full empirical performance claims
+```bash
+PYTHONPATH=src uv run python scripts/run_execution_quality_report.py
+PYTHONPATH=src uv run python scripts/run_probability_calibration_report.py
+PYTHONPATH=src uv run python scripts/run_monte_carlo_simulation.py
+PYTHONPATH=src uv run python scripts/run_ml_filter_demo.py
+PYTHONPATH=src uv run python scripts/generate_report_figures.py
+```
+
+Reports generated from public samples must be labeled as demonstration outputs, not complete empirical performance claims.

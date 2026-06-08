@@ -12,7 +12,7 @@
 
 This project studies whether apparent pricing edges in short-horizon prediction markets can survive real execution frictions.
 
-The public version is designed as a FinTech, market microstructure, and execution-quality research project. It is not positioned as an automated trading bot or production execution system.
+It is designed as a FinTech, market microstructure, and execution-quality research project. It is not positioned as an automated trading bot or production execution system.
 
 ## Research Question
 
@@ -27,23 +27,23 @@ When a model detects a potential short-horizon prediction-market mispricing, doe
 
 ## Case Study Scope
 
-The initial case study uses Polymarket BTC short-horizon markets and BTC reference market data.
+The case study uses Polymarket BTC short-horizon markets and BTC reference market data.
 
 This scope is intentionally narrow so that the project can focus on execution quality, probability modeling, replayable analysis, and post-trade diagnostics.
 
 ## Public Deliverables
 
-Planned public deliverables include:
+The repository includes:
 
 - reproducible research modules under `src/`
-- sample or anonymized data schemas under `data/sample/`
-- execution-quality reports under `reports/`
+- anonymized public sample data under `data/sample/`
+- execution-quality and methodology reports under `reports/`
 - explanatory notebooks under `notebooks/`
-- a lightweight dashboard under `dashboard/`
+- a lightweight Streamlit dashboard under `dashboard/`
 - project documentation under `docs/`
 
-## Current Status
+## Public-Safe Boundary
 
-This repository is currently being migrated from a private experimental working codebase into a public research-oriented portfolio project.
+The project excludes private raw ledgers, raw tick snapshots, wallet identifiers, order IDs, signer logic, allowance logic, deployment details, live execution runbooks, and private model artifacts.
 
-Legacy scripts may still exist in the root directory during migration. They are retained temporarily as references and should not be treated as final public APIs or public-facing modules.
+Public outputs are demonstration artifacts based on anonymized, downsampled, and normalized sample data. They are intended to show the research workflow, not to claim complete historical performance or production readiness.

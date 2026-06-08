@@ -1,6 +1,6 @@
 # Methodology
 
-This document describes the public methodology implemented in the research-oriented codebase. The workflow is designed for reproducible sample-backed diagnostics, not live execution or strategy deployment.
+This document describes the public methodology used by Prediction Market Execution Lab. The workflow is designed for reproducible sample-backed diagnostics, not live execution or strategy deployment.
 
 ## 1. Market Price as Implied Probability
 
@@ -15,9 +15,9 @@ The project distinguishes between:
 
 ## 2. Fair Probability Model
 
-The public version will expose a simplified fair probability model for short-horizon BTC outcome markets.
+The fair probability model estimates the probability of a short-horizon BTC outcome using reference-market features and remaining time to expiry.
 
-The model is intended to estimate a fair probability using reference BTC market data and remaining time to expiry. The first public version will prioritize clarity and reproducibility over strategy optimization.
+The public implementation prioritizes clarity, reproducibility, and interpretability over strategy optimization.
 
 ## 3. Edge Definition
 
@@ -30,7 +30,7 @@ This distinction is central to the project.
 
 ## 4. Execution-Quality Analysis
 
-Execution quality will be evaluated using signal and execution-state funnels, such as:
+Execution quality is evaluated using signal and execution-state funnels, such as:
 
 ```text
 candidate signal
@@ -41,17 +41,17 @@ candidate signal
 → attributed PnL or simulated result
 ```
 
-The public version will use sample or anonymized data where needed.
+The public workflow uses anonymized sample data where private execution records would otherwise be required.
 
 ## 5. Tick-Level Replay Backtesting
 
-Tick-level replay is used to evaluate whether a signal would still be actionable when replayed against historical market snapshots.
+Tick-level replay evaluates whether a signal would still be actionable when replayed against historical market snapshots.
 
 The goal is not to claim live performance, but to diagnose how market conditions affect signal viability.
 
 ## 6. PnL Attribution
 
-PnL attribution will decompose outcomes by research dimensions such as:
+PnL attribution decomposes outcomes by research dimensions such as:
 
 - edge bucket
 - spread bucket
@@ -60,13 +60,19 @@ PnL attribution will decompose outcomes by research dimensions such as:
 - fill quality
 - side or market state
 
-## 7. ML-Assisted Filtering
+## 7. Probability Calibration
 
-Machine learning may be used as an optional signal-quality diagnostic layer.
+Calibration diagnostics compare model-estimated probabilities and market-implied probabilities with realized settlement outcomes.
 
-The public project will avoid treating ML as a black-box alpha engine. Any ML component should include validation notes and overfitting limitations.
+The public report uses market-level joins over anonymized sample data and reports metrics such as Brier score, log loss, calibration buckets, and realized outcome rates.
 
-The current public implementation uses anonymized sample execution records to demonstrate the validation workflow:
+## 8. ML-Assisted Filtering
+
+Machine learning is treated as an optional signal-quality diagnostic layer.
+
+The project avoids treating ML as a black-box alpha engine. Any ML component should include validation notes and overfitting limitations.
+
+The public implementation uses anonymized sample execution records to demonstrate the validation workflow:
 
 ```text
 public sample executions
@@ -76,14 +82,16 @@ public sample executions
 → pass/reject diagnostics
 ```
 
-This demo is not evidence of production predictive performance or trading profitability. Its purpose is to show how signal filtering should be structured, validated, and documented without leaking private strategy details.
+This demo is not evidence of production predictive performance or trading profitability. Its purpose is to show how signal filtering can be structured, validated, and documented without leaking private strategy details.
 
-## 8. Risk Simulation
+## 9. Risk Simulation
 
-Monte Carlo and bootstrap-style simulations may be used to estimate drawdown, losing streaks, and sensitivity to execution assumptions.
+Monte Carlo and bootstrap-style simulations estimate drawdown, losing streaks, terminal PnL dispersion, and sensitivity to execution assumptions.
 
-## 9. Limitations
+The public report uses normalized sample PnL values, not real account-level PnL.
 
-The methodology should always distinguish between backtested, simulated, anonymized, and live-observed evidence.
+## 10. Limitations
+
+The methodology always distinguishes between backtested, simulated, anonymized, and live-observed evidence.
 
 No public report should imply a reliable profit strategy unless supported by reproducible evidence.

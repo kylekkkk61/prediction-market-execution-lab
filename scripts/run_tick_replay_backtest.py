@@ -1,6 +1,6 @@
 """Run the public tick replay demo on sample data.
 
-This script is intentionally read-only and research-oriented. It loads synthetic
+This script is intentionally read-only and research-oriented. It loads public
 sample snapshots, emits candidate signals, and prints a compact summary.
 """
 
@@ -8,19 +8,11 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
-import sys
+
+from backtesting.tick_replay import ReplayConfig, load_tick_snapshots_csv, replay_tick_snapshots
+from execution_quality.edge import ExecutionEdgeConfig
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-SRC_ROOT = PROJECT_ROOT / "src"
-if str(SRC_ROOT) not in sys.path:
-    sys.path.insert(0, str(SRC_ROOT))
-
-from backtesting.tick_replay import (  # noqa: E402
-    ReplayConfig,
-    load_tick_snapshots_csv,
-    replay_tick_snapshots,
-)
-from execution_quality.edge import ExecutionEdgeConfig  # noqa: E402
 
 
 def parse_args() -> argparse.Namespace:
