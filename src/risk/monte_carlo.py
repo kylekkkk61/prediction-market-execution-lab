@@ -243,6 +243,10 @@ The 5th and 95th percentile terminal PnL values describe downside and upside dis
 | Mean longest losing streak | {summary.mean_longest_losing_streak:.2f} |
 | 95th percentile longest losing streak | {summary.p95_longest_losing_streak:.2f} |
 
+## Author takeaway
+
+The simulation reinforces the same conclusion as the execution report: the public sample does not look like smooth edge capture. Pure tick replay and simulated backtests can show positive edge, but the live-like ledger sample gives a different answer once failed order submission, latency, quote staleness, API variability, fill probability, and execution gates are included. The seven-day public sample is short and based on live-like execution records, so it naturally looks sparse and zero-inflated. This simulation-to-live gap is the core experiment of the project: aligning replayed edge with realized executable performance.
+
 ## Downside-risk interpretation
 
 Drawdown and losing-streak statistics show how unfavorable sample paths can compound. They are especially important for short-horizon execution strategies because many small negative outcomes can accumulate before any large positive outcome appears.

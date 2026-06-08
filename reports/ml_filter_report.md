@@ -5,7 +5,7 @@ It uses anonymized sample data and does not establish production predictive perf
 
 ## Why add an ML filter
 
-Prediction-market signals can look attractive on theoretical edge alone, but many fail because of fill probability, spread, timing, or execution-state constraints. The ML-filter workflow is included to test whether a filter can improve signal quality after accounting for those observable features. It is diagnostic, not an alpha claim.
+Prediction-market signals can look attractive on theoretical edge alone, but many fail because of fill probability, spread, timing, or execution-state constraints. The ML filter was introduced as a post-edge EV gate: after a candidate passed edge and fill-probability checks, the model estimated expected PnL per USD and blocked trades below the minimum EV threshold. It is diagnostic, not an alpha claim.
 
 ## Data source
 
@@ -26,6 +26,11 @@ The public baseline uses only scalar, public-safe features that are already pres
 | `limit_price` | Public-safe limit-price diagnostic field. |
 | `fill_probability` | Public-safe fill-probability diagnostic. |
 | `elapsed_seconds` | Timing feature from market start or sample clock. |
+| `remaining_seconds` | Time remaining until resolution when available in private features. |
+| `bn_price` / `bn_open_price` | Binance BTCUSDT spot and opening-anchor proxy features used in the private workflow. |
+| volatility / `sigma_*` / `z` | Volatility and standardized-distance features from the fair probability model. |
+| order-book costs | Side cost, opposite cost, and total-cost style features when available. |
+| rolling quality metrics | Rolling ROI and win-rate style features from private ledger replay. |
 
 ## Walk-forward validation setup
 
@@ -60,7 +65,7 @@ This is useful as a validation example: a filter can be mechanically reasonable,
 
 ## Private-ledger decision diagnostics
 
-The current public sample includes anonymized ML and fill-probability decision fields exported from the private ledger. It keeps only safe scalar diagnostics and coarse reasons; it does not export model paths, feature lists, raw feature JSON, wallet/order identifiers, or raw responses.
+The current public sample includes anonymized ML and fill-probability decision fields exported from the private ledger. `ml_predicted_ev` represents expected PnL per USD under the private workflow, while `ml_min_ev` is the decision threshold. The export keeps only safe scalar diagnostics and coarse reasons; it does not export model paths, feature lists, raw feature JSON, wallet/order identifiers, or raw responses.
 
 | Metric | Value |
 |---|---:|
@@ -89,9 +94,17 @@ The current public sample includes anonymized ML and fill-probability decision f
 |---|---:|
 | predicted_ev_below_threshold | 268 |
 
+## Author takeaway
+
+I do not read the ML filter as a replacement for the fair probability model. Its role is to decide whether a theoretical candidate deserves to become an executable candidate. In longer private ledger replay, this post-edge EV gate appeared to improve trade quality, but the public seven-day sample is too small and too filtered to claim a stable PnL effect.
+
 ## Does the filter improve PnL, drawdown, or trade quality?
 
-The public baseline can be evaluated on fill-label quality through the chronological train/test split above. The exported private-ledger ML diagnostics can also show how often model and fill-probability decisions passed. However, this report does not make a causal PnL or drawdown claim from the ML filter because the public sample does not reconstruct full trade-level capital, fees, and account-level path dependency. Any PnL comparison by ML decision would be indicative only unless supported by stricter trade-level attribution.
+The public baseline can be evaluated on fill-label quality through the chronological train/test split above. The exported private-ledger ML diagnostics can also show how often model and fill-probability decisions passed. In my private full backtests and live-ledger replay, the ML EV filter improved the strategy relative to running the edge logic without that gate. However, the selected seven-day public sample cannot fully reproduce that improvement because it does not reconstruct full trade-level capital, fees, account-level path dependency, or the broader parameter history. Any PnL comparison by ML decision in this public report should therefore be treated as indicative rather than causal proof.
+
+## Fill-probability gate interpretation
+
+The fill-probability gate is the strictest and least mature gate in the current public sample. It was added late in the experiment and was initially configured with a high threshold because private ledger replay suggested quality improvement. In subsequent live-like operation, that threshold appeared too conservative and suppressed nearly all trade flow. I treat it as an unfinished but important execution-quality control rather than a settled model.
 
 ## Overfitting and leakage limitations
 

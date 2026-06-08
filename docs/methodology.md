@@ -15,9 +15,17 @@ The project distinguishes between:
 
 ## 2. Reference Price Assumption
 
-The fair-probability workflow uses Binance BTCUSDT-style reference prices as a high-frequency proxy for BTC spot movement. The research motivation is that centralized exchange prices can update faster than prediction-market quotes and oracle- or settlement-linked reference mechanisms.
+The fair-probability workflow uses Binance BTCUSDT spot ticks as the faster reference layer and Binance-derived bucket open prices as the opening-anchor proxy. Polymarket BTC markets settle against an oracle-style reference rather than Binance directly. The research motivation is that centralized exchange prices can update faster than prediction-market quotes and resolution-linked reference mechanisms.
 
-This assumption is used to build fair probability and replay diagnostics. It should not be read as proof of a persistent lead-lag alpha unless a separate lead-lag study validates it.
+This assumption is used to build fair probability and replay diagnostics. It reflects a common player-observed reference-lag hypothesis in these markets, but this repository does not yet include a dedicated lead-lag validation study.
+
+The simplified fair-probability form is:
+
+```text
+Fair_yes = Phi(max(min(ln(p_now / p_open) / (sigma_eff * sqrt(tau)), Z_CAP), -Z_CAP))
+```
+
+where `p_now` is the Binance BTCUSDT spot tick proxy, `p_open` is the Binance-derived opening anchor proxy, `sigma_eff` is the effective volatility input, and `tau` is time to resolution.
 
 ## 3. Fair Probability Model
 
@@ -86,7 +94,9 @@ public sample executions
 → pass/reject diagnostics
 ```
 
-This demo is not evidence of production predictive performance or trading profitability. It also does not replay the original private ML model. The public sample now includes safe scalar decision diagnostics such as `ml_predicted_ev`, `ml_min_ev`, `ml_passed`, `ml_reason`, `fill_probability`, and `fill_prob_passed`. Model paths, feature-name lists, raw feature JSON, raw responses, order IDs, wallet identifiers, and signer/deployment details remain excluded.
+The private workflow uses a gate sequence of `edge gate → fill probability threshold → ML EV filter → order submission`. The fill-probability threshold and ML EV filter are configurable gates that can be enabled, disabled, or run with different threshold values across the sample period. As a result, the seven-day public sample may contain rows produced under different gate states and parameter settings. `ml_predicted_ev` is interpreted as expected PnL per USD, and `ml_min_ev` is the minimum EV threshold for allowing a candidate to proceed. The public sample includes safe scalar decision diagnostics such as `ml_predicted_ev`, `ml_min_ev`, `ml_passed`, `ml_reason`, `fill_probability`, and `fill_prob_passed`, while excluding model paths, feature-name lists, raw feature JSON, raw responses, order IDs, wallet identifiers, and signer/deployment details.
+
+This demo is not evidence of production predictive performance or trading profitability. It should be read as a validation workflow and execution-quality gate analysis.
 
 ## 10. Risk Simulation
 
@@ -96,6 +106,6 @@ The public report uses normalized sample PnL values, not real account-level PnL.
 
 ## 11. Limitations
 
-The methodology always distinguishes between backtested, simulated, anonymized, and live-observed evidence.
+The methodology always distinguishes between backtested, simulated, anonymized, and live-observed evidence. A central project goal is to study the gap between positive tick-replay results and weaker live-like ledger outcomes after failed order submission, latency, quote staleness, fill probability, and execution gates are included.
 
 No public report should imply a reliable profit strategy unless supported by reproducible evidence.

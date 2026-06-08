@@ -133,11 +133,31 @@ Settlement PnL is reported in normalized public-sample units. It is useful for d
 | Maximum normalized net PnL | 0.8313 |
 | Positive normalized PnL rate | 6.80% |
 
+## Author takeaway
+
+My conclusion from this sample is that the strategy did not yet convert theoretical edge into reliable realized PnL. The most interesting failure mode is not a single cost such as spread; it is the execution funnel itself.
+
 ## What the public sample suggests
 
 These metrics are intended to demonstrate the analysis pipeline. The public sample is anonymized, downsampled, and field-filtered, so it should not be interpreted as full strategy performance.
 
-In this public sample, normalized settlement PnL is weak and slightly negative on average, while the positive normalized PnL rate is low. This supports the central project lesson: visible signal edge is not equivalent to executable edge after acceptance, fill probability, timing, spread, latency, and settlement outcomes are incorporated.
+In this public sample, normalized settlement PnL is weak and slightly negative on average, while the positive normalized PnL rate is low. The PnL distribution is also highly zero-inflated: many markets contribute no positive normalized PnL because the strategy often does not form a matched position. This supports the central project lesson: visible signal edge is not equivalent to executable edge after acceptance, fill probability, timing, spread, latency, and settlement outcomes are incorporated.
+
+## Why filters were necessary
+
+The filter stack was introduced after the gap between simulation and live-like execution became too large to ignore. Pure tick replay could show positive performance, but live-like ledger replay exposed a different reality: network latency, WebSocket delay, order-book staleness, Polymarket API variability, failed order submission, and lower-than-assumed market-order success probability could erase much of the simulated edge. The filters are therefore not cosmetic; they are an attempt to align simulated edge with realized executable performance.
+
+## Edge bucket interpretation
+
+High signal-edge buckets show better execution survival in the public sample, but I do not read that mechanically as proof of alpha. A high edge can mean either an underexploited opportunity or a fair-probability error that other participants correctly avoided. This is exactly why the project separates signal edge, execution quality, and settlement PnL.
+
+## Time-bucket interpretation
+
+The `time_bucket` field is elapsed seconds in a five-minute market, so `270-300` represents the final 30 seconds. The final window produces more opportunities because volume and implied-probability movement tend to rise near resolution. However, longer live-ledger replay suggested that late-window opportunities were not meaningfully more profitable; the late window increases both opportunity density and last-time-window reversal risk.
+
+## Spread interpretation
+
+Spread still matters as an execution cost, but in this public sample spread is clustered near one cent and is not the most explanatory source of variation. The larger bottleneck is whether a signal survives the gates and becomes a filled position.
 
 ## What cannot be concluded
 
