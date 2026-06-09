@@ -45,6 +45,7 @@ This repository is **not** a trading bot, production execution system, or profit
 
 | Artifact | Description |
 |---|---|
+| [Portfolio Page Source](site/index.html) | Static public portfolio page source for a future GitHub Pages / Cloudflare Pages deployment. |
 | [Live Dashboard](https://prediction-market-execution-lab-4byaayq2atzengbe26nkfb.streamlit.app/) / [`dashboard/app.py`](dashboard/app.py) | Streamlit dashboard for public-sample execution diagnostics. Deployment notes: [`docs/deployment.md`](docs/deployment.md). |
 | [`reports/execution_quality_report.md`](reports/execution_quality_report.md) | Signal funnel, rejection reasons, edge before/after execution, settlement PnL, author takeaways. |
 | [`reports/probability_calibration_report.md`](reports/probability_calibration_report.md) | Fair probability vs market-implied calibration, tail-bucket instability, Binance reference-price assumption. |
