@@ -19,6 +19,23 @@ This repository is **not** a trading bot, production execution system, or profit
   <img src="docs/assets/portfolio_page_overview.png" alt="Portfolio page overview" width="780">
 </div>
 
+## Author Note
+
+Many people who know my work know that I have a strong interest in crypto, financial markets, and FinTech. Over the past ~100 days, I spent a significant amount of time studying prediction markets, with a particular focus on short-horizon Polymarket BTC markets.
+
+The original private experiment started as an automated trading prototype. It did not produce a clear profitability breakthrough, and that became the most important lesson. During the process, I collected second-level order-book depth snapshots for five-minute BTC prediction markets, built tick-level replay datasets, tested multiple machine-learning approaches and parameter settings, and eventually integrated one selected model into the private research workflow.
+
+What I learned was more valuable than a simple PnL result: apparent alpha can disappear quickly once spread, stale quotes, latency, failed fills, model gates, position constraints, and binary settlement risk are included. This public repository is the cleaned-up research version of that experience. It keeps the shareable analytics—fair probability modeling, executable-edge analysis, tick replay, execution diagnostics, calibration, ML filtering, and risk simulation—while excluding wallet, signer, allowance, live execution, private ledger, and strategy-sensitive details.
+
+## Core Idea
+
+```text
+theoretical edge = fair probability - market-implied probability
+executable edge  ≈ theoretical edge - spread - slippage - latency / fill-risk costs - settlement error
+```
+
+The central question is not whether a signal can look good in isolation. It is whether that signal can survive the full execution path and still become reliable filled exposure.
+
 ## TL;DR
 
 | Question | Answer |
