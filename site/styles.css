@@ -407,3 +407,18 @@ figcaption {
     width: 100%;
   }
 }
+.architecture-flow div {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.architecture-flow strong {
+  color: var(--text);
+  font-size: 0.98rem;
+}
+
+.architecture-flow span {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}

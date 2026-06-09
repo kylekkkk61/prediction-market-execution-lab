@@ -9,7 +9,9 @@
 [![Streamlit](https://img.shields.io/badge/dashboard-Streamlit-FF4B4B?style=flat-square&logo=streamlit&logoColor=white)](https://streamlit.io/)
 [![Status](https://img.shields.io/badge/status-research%20demo-lightgrey?style=flat-square)](#)
 
-Prediction Market Execution Lab is a public FinTech / market microstructure research project that studies whether apparent prediction-market pricing edge can survive spread, fill probability, latency, order failure, model gates, and settlement outcomes.
+Prediction Market Execution Lab is a public FinTech / market microstructure research project testing whether apparent prediction-market edge can survive the full path from signal detection to filled exposure and settlement.
+
+**Key lesson:** short-horizon prediction-market edge is not only a pricing problem; it is an execution-quality problem.
 
 This repository is **not** a trading bot, production execution system, or profitable strategy claim. It is a research portfolio project built around executable-edge analysis in Polymarket BTC short-horizon markets.
 
@@ -19,10 +21,12 @@ This repository is **not** a trading bot, production execution system, or profit
 
 ## TL;DR
 
-- **What I tested:** whether short-horizon Polymarket BTC pricing edge remains tradable after execution frictions.
-- **What I found:** the public sample does not support a profitability claim; the strategy did not yet convert theoretical edge into reliable realized PnL.
-- **Why it matters:** pure tick replay and simulated backtests can show positive edge, but live-like execution records become much weaker once failed order submission, latency, quote staleness, fill probability, model gates, and settlement outcomes are included.
-- **Core contribution:** a public-safe research workflow for separating theoretical edge from executable edge.
+| Question | Answer |
+|---|---|
+| What did I test? | Whether short-horizon Polymarket BTC pricing edge remains tradable after execution frictions. |
+| What did I find? | The public sample does not support a profitability claim; the strategy did not yet convert theoretical edge into reliable realized PnL. |
+| Why does it matter? | Pure tick replay can look positive, but live-like execution records become weaker after latency, quote staleness, failed order submission, fill probability, model gates, and settlement outcomes. |
+| Core contribution | A public-safe research workflow for separating theoretical edge from executable edge. |
 
 ## Key Findings
 
@@ -57,22 +61,29 @@ This repository is **not** a trading bot, production execution system, or profit
 
 ## Visual Summary
 
+<div align="center">
+  <img src="reports/figures/system_architecture.png" alt="System architecture" width="780"><br>
+  <em>Research workflow: public sample data moves through probability modeling, edge calculation, execution diagnostics, reports, notebooks, dashboard, and risk simulation.</em>
+</div>
+
+<br>
+
 <table align="center">
   <tr>
     <td align="center">
       <img src="reports/figures/signal_funnel.png" alt="Signal funnel" width="360"><br>
-      <em>Execution funnel: where theoretical edge is lost before filled exposure.</em>
+      <em>Most candidate signals do not become filled exposure.</em>
     </td>
     <td align="center">
       <img src="reports/figures/execution_status_breakdown.png" alt="Execution status breakdown" width="360"><br>
-      <em>Status breakdown: how public-sample attempts split across execution states.</em>
+      <em>Execution states explain where public-sample attempts fail.</em>
     </td>
   </tr>
 </table>
 
 ## Dashboard Preview
 
-The live dashboard provides an interactive public-sample walkthrough for execution-quality diagnostics, ML/filter checks, report previews, and sample tables.
+The live dashboard follows a five-step review flow: overview, execution funnel, probability calibration, ML/fill diagnostics, and report/sample-table inspection.
 
 <div align="center">
   <img src="docs/assets/dashboard_demo.gif" alt="Dashboard demo preview" width="780">
@@ -82,23 +93,11 @@ The live dashboard provides an interactive public-sample walkthrough for executi
 
 > Can apparent short-horizon prediction-market pricing edges survive real execution frictions such as bid-ask spread, slippage, fill probability, latency, position limits, and settlement outcomes?
 
-The project separates two concepts:
-
-- **Theoretical edge:** the difference between a fair probability estimate and a market-implied probability.
-- **Executable edge:** the portion of that edge that remains after execution frictions and settlement outcomes are incorporated.
+The project separates two concepts: **theoretical edge**, the difference between a fair probability estimate and a market-implied probability; and **executable edge**, the portion that remains after execution frictions and settlement outcomes are incorporated.
 
 ## Why Prediction Markets
 
-Prediction-market prices can be interpreted as market-implied probabilities. That makes them useful for studying the gap between estimated fair probability and executable trading outcomes.
-
-Short-horizon BTC markets are especially useful because they combine:
-
-- rapidly changing reference prices
-- discrete binary settlement outcomes
-- CLOB-style bid-ask dynamics
-- time-to-resolution effects
-- liquidity and fill constraints
-- final-window reversal risk
+Prediction-market prices can be interpreted as market-implied probabilities, which makes them useful for studying the gap between estimated fair probability and executable outcomes. Short-horizon BTC markets are especially useful because they combine fast reference-price movement, binary settlement, CLOB bid-ask dynamics, time-to-resolution effects, liquidity constraints, and final-window reversal risk.
 
 The fair-probability workflow uses Binance BTCUSDT spot ticks as the faster reference layer and Binance-derived bucket open prices as the opening-anchor proxy. Polymarket BTC markets settle against an oracle-style reference rather than Binance directly. My working assumption, consistent with common player observations in these markets, is that the resolution-linked reference tends to follow Binance-style spot movement with a short delay. This repository does not yet include a dedicated lead-lag validation study, so the lag is treated as a domain-informed assumption rather than a proven empirical claim.
 
@@ -117,13 +116,15 @@ public sample data
 
 Main components:
 
-- **Fair probability modeling:** estimate outcome probability from Binance-style reference price movement, volatility, and time to resolution.
-- **Executable edge calculation:** adjust apparent edge for spread, slippage, fill probability, and execution assumptions.
-- **Tick-level replay:** test whether signals remain actionable under historical quote snapshots.
-- **Execution-quality diagnostics:** analyze candidate signals, rejected signals, fills, latency, edge decay, and settlement outcomes.
-- **Probability calibration:** compare fair and market-implied probabilities with realized outcomes.
-- **ML-assisted filtering workflow:** evaluate public-safe ML EV and fill-probability diagnostics without exposing model artifacts.
-- **Risk simulation:** bootstrap normalized public-sample outcomes to inspect terminal PnL, drawdown, and path dependency.
+| Component | What it answers |
+|---|---|
+| Fair probability modeling | What would a reference-price model estimate as the fair outcome probability? |
+| Executable edge calculation | How much apparent edge remains after spread, slippage, fill probability, and execution assumptions? |
+| Tick-level replay | Would the signal remain actionable under historical quote snapshots? |
+| Execution-quality diagnostics | Where do candidate signals fail: rejection, no-fill, latency, edge decay, or settlement? |
+| Probability calibration | Do fair and market-implied probabilities align with realized outcomes in the public sample? |
+| ML / fill-probability gates | Do public-safe scalar diagnostics help separate higher-quality candidates from weak ones? |
+| Risk simulation | How sparse, path-dependent, and drawdown-sensitive are normalized public-sample outcomes? |
 
 See [`docs/methodology.md`](docs/methodology.md) for the full methodology.
 

@@ -29,12 +29,12 @@
           <p class="eyebrow">FinTech · Market Microstructure · Execution Quality</p>
           <h1>Testing executable edge in Polymarket BTC short-horizon markets.</h1>
           <p class="lead">
-            A public research portfolio project studying whether apparent prediction-market pricing edge can survive
-            spread, fill probability, latency, order failure, model gates, and settlement outcomes.
+            A public market microstructure research project testing whether apparent prediction-market edge can survive
+            the full path from signal detection to filled exposure and settlement.
           </p>
           <p class="takeaway">
-            Main takeaway: the public sample does not support a profitability claim. The interesting result is the
-            gap between positive tick replay and weaker live-like execution outcomes.
+            Key lesson: short-horizon prediction-market edge is not only a pricing problem; it is an execution-quality problem.
+            The public sample does not support a profitability claim.
           </p>
           <div class="actions">
             <a class="button primary" href="https://prediction-market-execution-lab-4byaayq2atzengbe26nkfb.streamlit.app/">Open Live Dashboard</a>
@@ -62,6 +62,7 @@
             <p>
               Pure tick replay can show positive edge, but live-like ledger records become weaker after latency,
               quote staleness, order failure, fill probability, model gates, and settlement outcomes are included.
+              This gap is the main research object.
             </p>
           </article>
           <article class="card">
@@ -155,13 +156,12 @@
             systems out of the public repo.
           </p>
         </div>
-        <div class="workflow">
-          <div>Public sample data</div>
-          <div>Fair probability analysis</div>
-          <div>Edge and execution diagnostics</div>
-          <div>ML EV / fill-probability gates</div>
-          <div>Reports, notebooks, dashboard</div>
-          <div>Monte Carlo risk simulation</div>
+        <div class="workflow architecture-flow">
+          <div><strong>1. Public sample data</strong><span>Anonymized candidates, executions, settlements, and tick snapshots.</span></div>
+          <div><strong>2. Fair probability model</strong><span>Reference-price proxy, volatility, and time-to-resolution assumptions.</span></div>
+          <div><strong>3. Execution diagnostics</strong><span>Spread, fill probability, latency, rejected orders, and settlement outcomes.</span></div>
+          <div><strong>4. ML / risk checks</strong><span>ML EV gate, fill-probability gate, calibration, and Monte Carlo simulation.</span></div>
+          <div><strong>5. Public artifacts</strong><span>Reports, notebooks, dashboard, and portfolio page.</span></div>
         </div>
       </section>
 
