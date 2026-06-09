@@ -14,7 +14,7 @@ Prediction Market Execution Lab is a public FinTech / market microstructure rese
 This repository is **not** a trading bot, production execution system, or profitable strategy claim. It is a research portfolio project built around executable-edge analysis in Polymarket BTC short-horizon markets.
 
 <div align="center">
-  <img src="reports/figures/signal_funnel.png" alt="Signal funnel" width="780">
+  <img src="docs/assets/portfolio_page_overview.png" alt="Portfolio page overview" width="780">
 </div>
 
 ## TL;DR
@@ -69,6 +69,14 @@ This repository is **not** a trading bot, production execution system, or profit
     </td>
   </tr>
 </table>
+
+## Dashboard Preview
+
+The live dashboard provides an interactive public-sample walkthrough for execution-quality diagnostics, ML/filter checks, report previews, and sample tables.
+
+<div align="center">
+  <img src="docs/assets/dashboard_demo.gif" alt="Dashboard demo preview" width="780">
+</div>
 
 ## Research Question
 
