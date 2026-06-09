@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Prediction Market Execution Lab</title>
+    <meta
+      name="description"
+      content="A public research portfolio project testing whether apparent prediction-market edge survives execution frictions in Polymarket BTC short-horizon markets."
+    >
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="hero">
+      <nav class="nav" aria-label="Project navigation">
+        <a class="brand" href="#top" aria-label="Prediction Market Execution Lab home">PM Execution Lab</a>
+        <div class="nav-links">
+          <a href="#findings">Findings</a>
+          <a href="#artifacts">Artifacts</a>
+          <a href="#methodology">Methodology</a>
+          <a href="#disclaimer">Disclaimer</a>
+        </div>
+      </nav>
+
+      <section id="top" class="hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">FinTech · Market Microstructure · Execution Quality</p>
+          <h1>Testing executable edge in Polymarket BTC short-horizon markets.</h1>
+          <p class="lead">
+            A public research portfolio project studying whether apparent prediction-market pricing edge can survive
+            spread, fill probability, latency, order failure, model gates, and settlement outcomes.
+          </p>
+          <p class="takeaway">
+            Main takeaway: the public sample does not support a profitability claim. The interesting result is the
+            gap between positive tick replay and weaker live-like execution outcomes.
+          </p>
+          <div class="actions">
+            <a class="button primary" href="https://prediction-market-execution-lab-4byaayq2atzengbe26nkfb.streamlit.app/">Open Live Dashboard</a>
+            <a class="button" href="https://github.com/kylekkkk61/prediction-market-execution-lab">View GitHub Repo</a>
+            <a class="button" href="https://github.com/kylekkkk61/prediction-market-execution-lab/blob/main/reports/execution_quality_report.md">Read Reports</a>
+          </div>
+        </div>
+        <figure class="hero-card">
+          <img src="https://raw.githubusercontent.com/kylekkkk61/prediction-market-execution-lab/main/reports/figures/signal_funnel.png" alt="Signal funnel showing execution stages">
+          <figcaption>Execution funnel: where theoretical edge is lost before filled exposure.</figcaption>
+        </figure>
+      </section>
+    </header>
+
+    <main>
+      <section class="section" id="findings">
+        <div class="section-heading">
+          <p class="eyebrow">Key findings</p>
+          <h2>What the project shows</h2>
+        </div>
+        <div class="cards">
+          <article class="card">
+            <span class="number">01</span>
+            <h3>Simulation-to-live gap</h3>
+            <p>
+              Pure tick replay can show positive edge, but live-like ledger records become weaker after latency,
+              quote staleness, order failure, fill probability, model gates, and settlement outcomes are included.
+            </p>
+          </article>
+          <article class="card">
+            <span class="number">02</span>
+            <h3>Execution funnel dominates</h3>
+            <p>
+              The bottleneck is not a single cost such as spread. The harder question is whether a signal survives
+              acceptance, fill probability, ML EV filtering, order submission, and settlement.
+            </p>
+          </article>
+          <article class="card">
+            <span class="number">03</span>
+            <h3>Extreme probabilities are fragile</h3>
+            <p>
+              Very low and very high probability buckets are less stable in the public sample, especially around the
+              final resolution window where small price changes can cause large binary-outcome errors.
+            </p>
+          </article>
+          <article class="card">
+            <span class="number">04</span>
+            <h3>ML is an execution gate</h3>
+            <p>
+              The public workflow exports safe scalar ML EV and fill-probability diagnostics, but it does not ship
+              private model artifacts, raw feature JSON, or production execution logic.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section split" id="visuals">
+        <div>
+          <p class="eyebrow">Visual summary</p>
+          <h2>From signal edge to executable exposure</h2>
+          <p>
+            The dashboard and reports focus on the gap between apparent pricing edge and realized execution quality.
+            The figures below summarize the public-sample execution funnel and observed status breakdown.
+          </p>
+        </div>
+        <div class="visual-grid">
+          <figure>
+            <img src="https://raw.githubusercontent.com/kylekkkk61/prediction-market-execution-lab/main/reports/figures/signal_funnel.png" alt="Signal funnel chart">
+            <figcaption>Signal funnel</figcaption>
+          </figure>
+          <figure>
+            <img src="https://raw.githubusercontent.com/kylekkkk61/prediction-market-execution-lab/main/reports/figures/execution_status_breakdown.png" alt="Execution status breakdown chart">
+            <figcaption>Execution status breakdown</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section" id="artifacts">
+        <div class="section-heading">
+          <p class="eyebrow">Research artifacts</p>
+          <h2>Explore the public demo</h2>
+        </div>
+        <div class="artifact-grid">
+          <a class="artifact" href="https://prediction-market-execution-lab-4byaayq2atzengbe26nkfb.streamlit.app/">
+            <strong>Live Dashboard</strong>
+            <span>Interactive Streamlit dashboard built only on public sample artifacts.</span>
+          </a>
+          <a class="artifact" href="https://github.com/kylekkkk61/prediction-market-execution-lab/blob/main/reports/execution_quality_report.md">
+            <strong>Execution Quality Report</strong>
+            <span>Signal funnel, rejection reasons, edge decay, settlement PnL, and author takeaways.</span>
+          </a>
+          <a class="artifact" href="https://github.com/kylekkkk61/prediction-market-execution-lab/blob/main/reports/probability_calibration_report.md">
+            <strong>Probability Calibration Report</strong>
+            <span>Fair probability vs market-implied calibration and tail-bucket instability.</span>
+          </a>
+          <a class="artifact" href="https://github.com/kylekkkk61/prediction-market-execution-lab/blob/main/reports/ml_filter_report.md">
+            <strong>ML Filter Report</strong>
+            <span>ML EV gate, fill-probability diagnostics, walk-forward validation, and caveats.</span>
+          </a>
+          <a class="artifact" href="https://github.com/kylekkkk61/prediction-market-execution-lab/blob/main/reports/risk_simulation_report.md">
+            <strong>Risk Simulation Report</strong>
+            <span>Monte Carlo terminal PnL, drawdown, losing streak, and path dependency.</span>
+          </a>
+          <a class="artifact" href="https://github.com/kylekkkk61/prediction-market-execution-lab/tree/main/notebooks">
+            <strong>Six Research Notebooks</strong>
+            <span>Sample data, execution quality, reference price, calibration, ML diagnostics, and risk.</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="section split" id="methodology">
+        <div>
+          <p class="eyebrow">Methodology</p>
+          <h2>Public-safe research workflow</h2>
+          <p>
+            The project uses anonymized and downsampled public sample data to separate theoretical edge from
+            executable edge. It keeps private raw ledgers, wallets, order IDs, model artifacts, and live execution
+            systems out of the public repo.
+          </p>
+        </div>
+        <div class="workflow">
+          <div>Public sample data</div>
+          <div>Fair probability analysis</div>
+          <div>Edge and execution diagnostics</div>
+          <div>ML EV / fill-probability gates</div>
+          <div>Reports, notebooks, dashboard</div>
+          <div>Monte Carlo risk simulation</div>
+        </div>
+      </section>
+
+      <section class="section tech">
+        <div class="section-heading">
+          <p class="eyebrow">Tech stack</p>
+          <h2>Tools used</h2>
+        </div>
+        <ul class="chips" aria-label="Technology stack">
+          <li>Python 3.11+</li>
+          <li>uv</li>
+          <li>pandas</li>
+          <li>NumPy</li>
+          <li>matplotlib</li>
+          <li>Streamlit</li>
+          <li>pytest</li>
+          <li>Ruff</li>
+          <li>GitHub Actions</li>
+          <li>Monte Carlo</li>
+          <li>Tick replay</li>
+          <li>Probability calibration</li>
+        </ul>
+      </section>
+
+      <section class="section disclaimer" id="disclaimer">
+        <p class="eyebrow">Scope and disclaimer</p>
+        <h2>Research demo only</h2>
+        <p>
+          This is not financial advice, trading advice, investment advice, or a recommendation to participate in any
+          market. The repository does not claim to provide a profitable strategy, does not claim to predict BTC, and
+          does not provide a live trading or betting system.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>
