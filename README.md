@@ -19,6 +19,74 @@ This repository is **not** a trading bot, production execution system, or profit
   <img src="docs/assets/portfolio_page_overview.png" alt="Portfolio page overview" width="780">
 </div>
 
+## Author Note
+
+Many people who know my work know that I have a strong interest in crypto, financial markets, and FinTech. Over the past ~100 days, I spent a significant amount of time studying prediction markets, with a particular focus on short-horizon Polymarket BTC markets.
+
+The original private experiment started as an automated trading prototype. It did not produce a clear profitability breakthrough, and that became the most important lesson. During the process, I collected second-level order-book depth snapshots for five-minute BTC prediction markets, built tick-level replay datasets, tested multiple machine-learning approaches and parameter settings, and eventually integrated one selected model into the private research workflow.
+
+What I learned was more valuable than a simple PnL result: apparent alpha can disappear quickly once spread, stale quotes, latency, failed fills, model gates, position constraints, and binary settlement risk are included. This public repository is the cleaned-up research version of that experience. It keeps the shareable analytics—fair probability modeling, executable-edge analysis, tick replay, execution diagnostics, calibration, ML filtering, and risk simulation—while excluding wallet, signer, allowance, live execution, private ledger, and strategy-sensitive details.
+
+## Core Idea
+
+The first layer of the project is a public-safe fair-probability estimate for a five-minute binary BTC market. The model asks whether the reference price is likely to finish above the market's opening anchor:
+
+$$
+\sigma_{\text{eff}}
+= \sqrt{
+    w_s\sigma_s^2
+    + w_l\sigma_l^2
+    + \sigma_{\min}^2
+}
+$$
+
+$$
+ z
+ = \frac{\ln(P_t / P_0)}{\sigma_{\text{eff}}\sqrt{\tau}}
+$$
+
+$$
+P_{\text{fair, UP}} = \Phi\left(\operatorname{clip}(z, -z_{\max}, z_{\max})\right)
+$$
+
+$$
+P_{\text{fair, DOWN}} = 1 - P_{\text{fair, UP}}
+$$
+
+where \(P_t\) is the current BTC reference price, \(P_0\) is the opening-anchor price, \(\tau\) is remaining time to resolution, \(\sigma_s\) and \(\sigma_l\) are short- and long-window volatility estimates, and \(\Phi\) is the standard normal CDF.
+
+From there, the research question becomes execution-aware:
+
+$$
+\text{theoretical edge} = P_{\text{fair}} - P_{\text{market}}
+$$
+
+$$
+\text{executable edge}
+\approx
+\text{theoretical edge}
+- \text{spread}
+- \text{slippage}
+- \text{latency/fill-risk cost}
+- \text{settlement error}
+$$
+
+The central question is not whether a signal can look good in isolation. It is whether that signal can survive the full execution path and still become reliable filled exposure.
+
+## What Changed My Mind
+
+In the first 10--15 days of research, a simple tick-replay simulation looked much better than I expected. Replaying historical market states against my own price and probability model produced strong simulated results, which made the early phase of the project genuinely exciting.
+
+The gap appeared once I moved from replay to real-money execution. Live trading exposed frictions that the simple simulation did not fully capture: network latency, random Polymarket API response delays, stale order-book updates, and late-market reversals that became visible around the 20th to 30th day of observation. The core bottleneck was no longer only prediction accuracy. It was execution quality.
+
+That realization is why this repository is framed as an execution-quality research lab rather than a trading bot showcase.
+
+## Why This Public Version Is Safe
+
+The original private prototype contained sensitive operational details, including public wallet addresses, on-chain order hashes, private data logs, probability-calibration parameters, and machine-learning configuration choices. Those details are not suitable for a public repository.
+
+This public version keeps only the research components that can be shared safely: anonymized tick records, reference-price data, simplified order records, public-safe model outputs, reports, notebooks, and dashboard artifacts. Identifiable private data and live execution details have been removed so the project can be used for learning, review, and discussion without exposing production trading operations.
+
 ## TL;DR
 
 | Question | Answer |
