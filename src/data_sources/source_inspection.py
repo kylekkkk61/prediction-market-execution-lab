@@ -1,4 +1,4 @@
-"""Private raw data inspection utilities.
+"""Local source-data inspection utilities.
 
 These helpers intentionally produce aggregate schema summaries only. They do not
 emit raw ledger rows, raw tick payloads, order IDs, token IDs, wallet addresses,
@@ -42,7 +42,7 @@ DEFAULT_TICK_DIR = Path("private/raw_data/tick_snapshots")
 
 @dataclass(frozen=True)
 class CsvFileSummary:
-    """Aggregate summary for one private ledger CSV file."""
+    """Aggregate summary for one local source ledger CSV file."""
 
     path: str
     rows: int
@@ -52,7 +52,7 @@ class CsvFileSummary:
 
 @dataclass(frozen=True)
 class TickFileSummary:
-    """Aggregate summary for one private tick JSONL file."""
+    """Aggregate summary for one local source tick JSONL file."""
 
     path: str
     rows: int
@@ -66,8 +66,8 @@ class TickFileSummary:
 
 
 @dataclass(frozen=True)
-class PrivateDataInventory:
-    """Aggregate inventory of local private raw inputs."""
+class SourceDataInventory:
+    """Aggregate inventory of local source raw inputs."""
 
     ledger_dir: str
     tick_dir: str
@@ -178,13 +178,13 @@ def summarize_tick_file(path: Path, *, max_rows: int | None = None) -> TickFileS
     )
 
 
-def inspect_private_data(
+def inspect_source_data(
     ledger_dir: Path = DEFAULT_LEDGER_DIR,
     tick_dir: Path = DEFAULT_TICK_DIR,
     *,
     tick_max_rows: int | None = None,
-) -> PrivateDataInventory:
-    """Inspect local private raw inputs and return aggregate summaries."""
+) -> SourceDataInventory:
+    """Inspect local source raw inputs and return aggregate summaries."""
 
     ledger_csv_files = []
     tick_files = []
@@ -205,7 +205,7 @@ def inspect_private_data(
             elif path.is_file():
                 skipped_files.append(str(path))
 
-    return PrivateDataInventory(
+    return SourceDataInventory(
         ledger_dir=str(ledger_dir),
         tick_dir=str(tick_dir),
         ledger_csv_files=tuple(ledger_csv_files),
@@ -214,13 +214,13 @@ def inspect_private_data(
     )
 
 
-def inventory_to_markdown(inventory: PrivateDataInventory) -> str:
+def inventory_to_markdown(inventory: SourceDataInventory) -> str:
     """Render an aggregate inventory summary without raw rows."""
 
     lines = [
-        "# Private Data Inventory Summary",
+        "# Source Data Inventory Summary",
         "",
-        "This summary is generated from local private files and contains aggregate schema",
+        "This summary is generated from local source files and contains aggregate schema",
         "information only. It should not include raw rows, order IDs, token IDs, wallet",
         "addresses, or raw API responses.",
         "",

@@ -159,6 +159,10 @@ The `time_bucket` field is elapsed seconds in a five-minute market, so `270-300`
 
 Spread still matters as an execution cost, but in this public sample spread is clustered near one cent and is not the most explanatory source of variation. The larger bottleneck is whether a signal survives the gates and becomes a filled position.
 
+## What I learned
+
+The main lesson is that apparent edge is cheap to generate but expensive to execute. In this sample, the problem was not only whether the fair probability model found a price discrepancy; it was whether that discrepancy could survive timing, fill probability, model gates, order submission, and settlement. This is why I treat execution quality as the core research object rather than a footnote after signal generation.
+
 ## What cannot be concluded
 
 - The report does not prove that a live strategy is profitable or unprofitable across all market regimes.

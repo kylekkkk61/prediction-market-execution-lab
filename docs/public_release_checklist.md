@@ -69,9 +69,9 @@ Examples of reviewed-safe contexts:
 - sample-data schema notes describing anonymization and field filtering
 - tests using fake strings such as `secret-order` or `btc-updown-secret-market` to verify anonymization behavior
 
-### Private data inspection utilities
+### Local source-data inspection utilities
 
-`src/data_sources/private_inspection.py` and related tests intentionally operate as public-safe schema/inventory utilities. They summarize local private files without emitting raw rows, wallet addresses, order IDs, token IDs, or raw API responses.
+`src/data_sources/source_inspection.py` and related tests intentionally operate as public-safe schema/inventory utilities. They summarize local private files without emitting raw rows, wallet addresses, order IDs, token IDs, or raw API responses.
 
 These utilities are acceptable in the public repository because they document and test the boundary between local private inputs and public sample artifacts.
 

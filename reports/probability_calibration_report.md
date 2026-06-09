@@ -78,6 +78,10 @@ The final 5-10 seconds are especially vulnerable to last-time-window reversal ri
 
 Calibration buckets can show whether forecasts are systematically too high or too low in parts of the probability range. In this public sample, they suggest that the model and market-implied probabilities are more informative in the middle range than in the extremes. I treat the tail-bucket pattern as a warning about resolution-window microstructure rather than as a simple model-fitting problem.
 
+## What I learned
+
+The calibration result taught me that the model is most fragile when it looks most confident. Extreme probabilities can be driven by real price moves, but they can also be amplified by the short time remaining before resolution. I therefore treat tail-bucket confidence as something to audit, not something to trust mechanically.
+
 ## What calibration cannot prove
 
 - Calibration metrics do not prove executable edge or profitability.

@@ -51,7 +51,7 @@ This repository is **not** a trading bot, production execution system, or profit
 | [`reports/probability_calibration_report.md`](reports/probability_calibration_report.md) | Fair probability vs market-implied calibration, tail-bucket instability, Binance reference-price assumption. |
 | [`reports/ml_filter_report.md`](reports/ml_filter_report.md) | ML EV gate, fill-probability diagnostics, walk-forward validation, overfitting limitations. |
 | [`reports/risk_simulation_report.md`](reports/risk_simulation_report.md) | Monte Carlo terminal PnL, drawdown, losing-streak, and path-dependency diagnostics. |
-| [`notebooks/`](notebooks/) | Six-notebook research walkthrough covering sample data, execution quality, reference price, calibration, ML diagnostics, and risk simulation. |
+| [`notebooks/`](notebooks/) | Six-notebook research walkthrough covering sample data, execution quality, reference price, calibration, ML diagnostics, and risk simulation. See the [`notebooks/README.md`](notebooks/README.md) guide. |
 | [`docs/methodology.md`](docs/methodology.md) | Methodology details, fair probability formula, reference-price assumptions, gate sequence. |
 | [`docs/limitations.md`](docs/limitations.md) | Scope limits, replay/live gap, reference-lag assumption, ML/filter caveats. |
 
@@ -126,6 +126,16 @@ Main components:
 - **Risk simulation:** bootstrap normalized public-sample outcomes to inspect terminal PnL, drawdown, and path dependency.
 
 See [`docs/methodology.md`](docs/methodology.md) for the full methodology.
+
+## Skills Demonstrated
+
+- **Market microstructure reasoning:** separate theoretical pricing edge from executable exposure.
+- **Probability modeling:** estimate fair probability and compare it with market-implied probability.
+- **Execution-quality diagnostics:** analyze spread, fill probability, latency, rejected orders, failed fills, and settlement outcomes.
+- **Backtesting discipline:** compare positive tick-replay results with weaker live-like execution records.
+- **ML evaluation:** use ML EV and fill-probability gates as signal-quality filters rather than profit guarantees.
+- **Risk analysis:** use Monte Carlo simulation to inspect sparse, path-dependent PnL outcomes.
+- **Public-safe research engineering:** convert private trading experiments into anonymized reports, notebooks, dashboards, and portfolio artifacts.
 
 ## Tech Stack
 
@@ -219,7 +229,7 @@ prediction-market-execution-lab/
 ├── scripts/                      # Demo-safe report, figure, sample, and simulation runners
 ├── src/                          # Public research modules
 │   ├── backtesting/              # Tick-level replay logic
-│   ├── data_sources/             # Public sample loading and private-inspection helpers
+│   ├── data_sources/             # Public sample loading and local source-inspection helpers
 │   ├── execution_quality/        # Edge and fill-quality calculations
 │   ├── models/                   # Fair probability, calibration, and ML-filter demos
 │   ├── risk/                     # Monte Carlo risk simulation

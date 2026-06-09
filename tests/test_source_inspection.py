@@ -3,9 +3,9 @@ import gzip
 import json
 from pathlib import Path
 
-from data_sources.private_inspection import (
+from data_sources.source_inspection import (
     detect_sensitive_columns,
-    inspect_private_data,
+    inspect_source_data,
     inventory_to_markdown,
     summarize_csv_file,
     summarize_tick_file,
@@ -71,7 +71,7 @@ def test_summarize_tick_file_counts_aggregate_fields(tmp_path: Path) -> None:
     assert "token_id" in summary.sensitive_columns
 
 
-def test_inspect_private_data_and_markdown_summary(tmp_path: Path) -> None:
+def test_inspect_source_data_and_markdown_summary(tmp_path: Path) -> None:
     ledger_dir = tmp_path / "ledger"
     tick_dir = tmp_path / "tick_snapshots"
     ledger_dir.mkdir()
@@ -94,7 +94,7 @@ def test_inspect_private_data_and_markdown_summary(tmp_path: Path) -> None:
         encoding="utf-8",
     )
 
-    inventory = inspect_private_data(ledger_dir=ledger_dir, tick_dir=tick_dir)
+    inventory = inspect_source_data(ledger_dir=ledger_dir, tick_dir=tick_dir)
     rendered = inventory_to_markdown(inventory)
 
     assert len(inventory.ledger_csv_files) == 1
