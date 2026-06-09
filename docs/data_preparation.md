@@ -160,15 +160,15 @@ PYTHONPATH=src uv run python scripts/prepare_public_sample_data.py \
   --max-ledger-rows-per-file 100
 ```
 
-## Private Schema Inspection
+## Local Source Schema Inspection
 
-Private inspection utilities are local-only helpers for understanding raw data shape without printing or committing sensitive rows.
+Local source inspection utilities are local-only helpers for understanding raw data shape without printing or committing sensitive rows.
 
 Usage:
 
 ```bash
-PYTHONPATH=src uv run python scripts/inspect_private_ledger.py
-PYTHONPATH=src uv run python scripts/inspect_private_ticks.py --max-rows-per-file 1000
+PYTHONPATH=src uv run python scripts/inspect_source_ledger.py
+PYTHONPATH=src uv run python scripts/inspect_source_ticks.py --max-rows-per-file 1000
 ```
 
 These scripts print aggregate summaries only and should not be used to publish raw data.

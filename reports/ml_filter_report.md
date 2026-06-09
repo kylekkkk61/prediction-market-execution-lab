@@ -106,6 +106,10 @@ The public baseline can be evaluated on fill-label quality through the chronolog
 
 The fill-probability gate is the strictest and least mature gate in the current public sample. It was added late in the experiment and was initially configured with a high threshold because private ledger replay suggested quality improvement. In subsequent live-like operation, that threshold appeared too conservative and suppressed nearly all trade flow. I treat it as an unfinished but important execution-quality control rather than a settled model.
 
+## What I learned
+
+The ML layer is most useful when treated as a quality-control gate rather than an alpha engine. Its practical role is to ask whether a signal that already looks attractive still deserves execution exposure. That framing keeps the model useful while avoiding the false precision of treating an EV score as a profitability guarantee.
+
 ## Overfitting and leakage limitations
 
 - These diagnostics are based on anonymized public sample rows, not the full private ledger.

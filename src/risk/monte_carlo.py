@@ -247,6 +247,10 @@ The 5th and 95th percentile terminal PnL values describe downside and upside dis
 
 The simulation reinforces the same conclusion as the execution report: the public sample does not look like smooth edge capture. Pure tick replay and simulated backtests can show positive edge, but the live-like ledger sample gives a different answer once failed order submission, latency, quote staleness, API variability, fill probability, and execution gates are included. The seven-day public sample is short and based on live-like execution records, so it naturally looks sparse and zero-inflated. This simulation-to-live gap is the core experiment of the project: aligning replayed edge with realized executable performance.
 
+## What I learned
+
+The risk simulation made the simulation-to-live gap more visible. A strategy can look attractive in replay while still producing sparse, path-dependent realized exposure once fills, failures, and gates are included. I therefore read the Monte Carlo output as a stress test for execution assumptions, not as a capital-allocation model.
+
 ## Downside-risk interpretation
 
 Drawdown and losing-streak statistics show how unfavorable sample paths can compound. They are especially important for short-horizon execution strategies because many small negative outcomes can accumulate before any large positive outcome appears.

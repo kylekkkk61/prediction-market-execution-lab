@@ -6,7 +6,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from data_sources.private_inspection import PrivateDataInventory, inspect_private_data, inventory_to_markdown
+from data_sources.source_inspection import SourceDataInventory, inspect_source_data, inventory_to_markdown
 
 
 def parse_args() -> argparse.Namespace:
@@ -22,8 +22,8 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    inventory = inspect_private_data(ledger_dir=args.ledger_dir, tick_dir=Path("__skip_ticks__"))
-    ledger_only = PrivateDataInventory(
+    inventory = inspect_source_data(ledger_dir=args.ledger_dir, tick_dir=Path("__skip_ticks__"))
+    ledger_only = SourceDataInventory(
         ledger_dir=inventory.ledger_dir,
         tick_dir="not inspected",
         ledger_csv_files=inventory.ledger_csv_files,
