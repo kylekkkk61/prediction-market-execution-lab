@@ -29,10 +29,47 @@ What I learned was more valuable than a simple PnL result: apparent alpha can di
 
 ## Core Idea
 
-```text
-theoretical edge = fair probability - market-implied probability
-executable edge  ≈ theoretical edge - spread - slippage - latency / fill-risk costs - settlement error
-```
+The first layer of the project is a public-safe fair-probability estimate for a five-minute binary BTC market. The model asks whether the reference price is likely to finish above the market's opening anchor:
+
+$$
+\sigma_{\text{eff}}
+= \sqrt{
+    w_s\sigma_s^2
+    + w_l\sigma_l^2
+    + \sigma_{\min}^2
+}
+$$
+
+$$
+ z
+ = \frac{\ln(P_t / P_0)}{\sigma_{\text{eff}}\sqrt{\tau}}
+$$
+
+$$
+P_{\text{fair, UP}} = \Phi\left(\operatorname{clip}(z, -z_{\max}, z_{\max})\right)
+$$
+
+$$
+P_{\text{fair, DOWN}} = 1 - P_{\text{fair, UP}}
+$$
+
+where \(P_t\) is the current BTC reference price, \(P_0\) is the opening-anchor price, \(\tau\) is remaining time to resolution, \(\sigma_s\) and \(\sigma_l\) are short- and long-window volatility estimates, and \(\Phi\) is the standard normal CDF.
+
+From there, the research question becomes execution-aware:
+
+$$
+\text{theoretical edge} = P_{\text{fair}} - P_{\text{market}}
+$$
+
+$$
+\text{executable edge}
+\approx
+\text{theoretical edge}
+- \text{spread}
+- \text{slippage}
+- \text{latency/fill-risk cost}
+- \text{settlement error}
+$$
 
 The central question is not whether a signal can look good in isolation. It is whether that signal can survive the full execution path and still become reliable filled exposure.
 
