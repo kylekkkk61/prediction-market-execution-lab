@@ -69,25 +69,37 @@ https://prediction-market-execution-lab-4byaayq2atzengbe26nkfb.streamlit.app/
 
 The dashboard is a public-sample demonstration. It reads only tracked sample data and generated report artifacts, and it does not connect to private ledgers, wallets, exchanges, live market APIs, order-routing systems, or execution infrastructure.
 
+## Public portfolio page
+
+The verified static portfolio page is available at:
+
+```text
+https://pm-lab.kylekkkk.com/
+```
+
+GitHub Pages fallback URL:
+
+```text
+https://kylekkkk61.github.io/prediction-market-execution-lab/
+```
+
+The portfolio page is a static landing page for the public research project. It links to the Streamlit dashboard, GitHub repository, reports, notebooks, methodology, and limitations.
+
 ## Custom domain strategy
 
-This project can use a custom domain in two ways:
-
-1. **Recommended portfolio route:** use the custom domain for a static project landing page, then link from that page to the Streamlit dashboard URL.
-2. **Dashboard route:** if the hosting provider supports custom domains directly, point a dashboard subdomain to the hosted app.
-
-For Streamlit Community Cloud, this project should not assume direct custom-domain support unless the deployed app settings explicitly provide it. A stable fallback is:
+The project uses the custom domain for the static portfolio landing page:
 
 ```text
-custom domain landing page → Streamlit Cloud dashboard URL
+https://pm-lab.kylekkkk.com/ → GitHub Pages static site
 ```
 
-Example future structure:
+The Streamlit dashboard remains hosted on Streamlit Community Cloud:
 
 ```text
-pm-lab.<your-domain>        # static project landing page
-dashboard link              # Streamlit Community Cloud app URL
+https://prediction-market-execution-lab-4byaayq2atzengbe26nkfb.streamlit.app/
 ```
+
+This keeps the public entry point under the project domain while avoiding unsupported assumptions about direct custom-domain support for Streamlit Community Cloud.
 
 ## Deployment safety checklist
 
