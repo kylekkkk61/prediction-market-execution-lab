@@ -51,6 +51,22 @@ def image_if_available(path: Path, caption: str, width: int | str = "stretch") -
         st.info(f"Figure not found: {path.relative_to(ROOT)}")
 
 
+def render_dashboard_flow() -> None:
+    """Render the intended reading order for the public dashboard."""
+    st.subheader("How to read this dashboard")
+    flow = [
+        ("1. Overview", "Sample size, accepted rate, fill rate, spread, latency, and normalized PnL context."),
+        ("2. Execution Funnel", "Where candidate signals fail before becoming filled exposure."),
+        ("3. Probability Calibration", "Whether fair and market-implied probabilities align with outcomes."),
+        ("4. ML / Fill Diagnostics", "How post-edge gates behave as execution-quality filters."),
+        ("5. Reports & Tables", "Markdown reports and public sample rows for deeper inspection."),
+    ]
+    columns = st.columns(len(flow))
+    for column, (title, description) in zip(columns, flow, strict=True):
+        column.markdown(f"**{title}**")
+        column.caption(description)
+
+
 def compute_overview_metrics(
     candidates: pd.DataFrame,
     executions: pd.DataFrame,
@@ -106,6 +122,7 @@ def render_metric_grid(metrics: dict[str, str]) -> None:
 def render_status_breakdown(executions: pd.DataFrame) -> None:
     """Render execution-status diagnostics from public sample rows."""
     st.subheader("Execution status breakdown")
+    st.caption("This view shows where public-sample order attempts ended up after signal generation.")
     if executions.empty or "status" not in executions:
         st.info("No execution status data available in the public sample.")
         return
@@ -122,6 +139,7 @@ def render_status_breakdown(executions: pd.DataFrame) -> None:
 def render_fill_rate_by_bucket(executions: pd.DataFrame) -> None:
     """Render fill-rate diagnostics by available public-sample buckets."""
     st.subheader("Fill rate by time bucket")
+    st.caption("Elapsed-time buckets help show whether execution quality changes across the five-minute market window.")
     required_columns = {"time_bucket", "filled"}
     if executions.empty or not required_columns.issubset(executions.columns):
         st.info("No time-bucket fill-rate data available in the public sample.")
@@ -146,11 +164,12 @@ def render_fill_rate_by_bucket(executions: pd.DataFrame) -> None:
 def render_edge_and_spread(executions: pd.DataFrame, candidates: pd.DataFrame) -> None:
     """Render edge and spread diagnostics without new performance claims."""
     st.subheader("Edge and spread diagnostics")
+    st.caption("These figures separate apparent signal edge from the spread and fill frictions required to execute it.")
     columns = st.columns(2)
     with columns[0]:
-        image_if_available(FIGURES_DIR / "fill_rate_by_edge_bucket.png", "Fill rate by edge bucket")
+        image_if_available(FIGURES_DIR / "fill_rate_by_edge_bucket.png", "Higher apparent edge does not automatically mean better execution")
     with columns[1]:
-        image_if_available(FIGURES_DIR / "spread_distribution.png", "Spread distribution")
+        image_if_available(FIGURES_DIR / "spread_distribution.png", "Spread is visible, but not the whole execution problem")
 
     diagnostics = []
     if not executions.empty and "signal_edge" in executions:
@@ -172,6 +191,7 @@ def render_edge_and_spread(executions: pd.DataFrame, candidates: pd.DataFrame) -
 def render_ml_diagnostics(executions: pd.DataFrame) -> None:
     """Render public-safe ML and fill-probability decision diagnostics."""
     st.subheader("ML and fill-probability diagnostics")
+    st.caption("ML EV and fill-probability checks are post-edge quality gates, not standalone profit claims.")
     if executions.empty:
         st.info("No execution sample data available for ML diagnostics.")
         return
@@ -229,13 +249,14 @@ def render_ml_diagnostics(executions: pd.DataFrame) -> None:
 def render_calibration_and_risk() -> None:
     """Render existing calibration and risk figures."""
     st.subheader("Calibration and risk simulation")
+    st.caption("Calibration checks whether probability estimates align with outcomes; Monte Carlo stresses sparse normalized PnL paths.")
     columns = st.columns(3)
     with columns[0]:
-        image_if_available(FIGURES_DIR / "calibration_curve.png", "Probability calibration curve")
+        image_if_available(FIGURES_DIR / "calibration_curve.png", "Extreme probabilities are where confidence becomes fragile")
     with columns[1]:
-        image_if_available(FIGURES_DIR / "monte_carlo_terminal_pnl.png", "Monte Carlo terminal PnL")
+        image_if_available(FIGURES_DIR / "monte_carlo_terminal_pnl.png", "Sparse realized exposure creates path-dependent outcomes")
     with columns[2]:
-        image_if_available(FIGURES_DIR / "monte_carlo_drawdown.png", "Monte Carlo drawdown")
+        image_if_available(FIGURES_DIR / "monte_carlo_drawdown.png", "Drawdown risk remains even in a normalized public sample")
 
 
 @st.cache_data
@@ -328,9 +349,10 @@ def main() -> None:
     st.caption("Testing Executable Edge in Polymarket BTC Short-Horizon Markets")
 
     st.info(
-        "This dashboard uses anonymized, downsampled, and normalized public sample data only. "
-        "It is a demonstration interface for execution-quality diagnostics, not a live trading "
-        "tool, production execution system, or profitability claim."
+        "This dashboard shows how theoretical pricing edge decays through execution gates, "
+        "failed fills, latency, and settlement outcomes. It uses anonymized, downsampled, "
+        "and normalized public sample data only, and it is not a live trading tool, production "
+        "execution system, or profitability claim."
     )
 
     candidates = load_csv("candidates_sample.csv")
@@ -341,30 +363,33 @@ def main() -> None:
     st.header("Project overview")
     st.markdown(
         """
-        This demo summarizes whether apparent short-horizon prediction-market pricing edges
-        can survive execution frictions such as bid-ask spread, fill probability, latency,
-        position limits, and settlement outcomes.
+        This demo is organized around one practical question: after a signal is detected, does it
+        survive the path from theoretical edge to accepted, filled, and settled exposure?
 
         The public dashboard is intentionally read-only and sample-backed. It does not expose
         wallet logic, signer logic, order submission, allowance maintenance, private ledgers,
         or live market connectivity.
         """
     )
+    render_dashboard_flow()
 
     metrics = compute_overview_metrics(candidates, executions, settlements, ticks)
     render_metric_grid(metrics)
 
     st.header("Execution-quality diagnostics")
-    image_if_available(FIGURES_DIR / "signal_funnel.png", "Signal funnel")
+    st.caption("Step 2: follow the execution funnel from candidate signals to accepted, filled, and settled exposure.")
+    image_if_available(FIGURES_DIR / "signal_funnel.png", "Most candidate signals do not become filled exposure")
     render_status_breakdown(executions)
     render_fill_rate_by_bucket(executions)
     render_edge_and_spread(executions, candidates)
     render_ml_diagnostics(executions)
 
     st.header("Calibration and risk")
+    st.caption("Step 3: inspect probability calibration and path-dependent risk diagnostics.")
     render_calibration_and_risk()
 
     st.header("Reports and sample tables")
+    st.caption("Step 5: open generated reports and sample rows for reviewer-level detail.")
     render_report_links()
     render_sample_tables(candidates, executions, settlements, ticks)
 
