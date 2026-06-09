@@ -36,6 +36,20 @@ executable edge  ≈ theoretical edge - spread - slippage - latency / fill-risk 
 
 The central question is not whether a signal can look good in isolation. It is whether that signal can survive the full execution path and still become reliable filled exposure.
 
+## What Changed My Mind
+
+In the first 10--15 days of research, a simple tick-replay simulation looked much better than I expected. Replaying historical market states against my own price and probability model produced strong simulated results, which made the early phase of the project genuinely exciting.
+
+The gap appeared once I moved from replay to real-money execution. Live trading exposed frictions that the simple simulation did not fully capture: network latency, random Polymarket API response delays, stale order-book updates, and late-market reversals that became visible around the 20th to 30th day of observation. The core bottleneck was no longer only prediction accuracy. It was execution quality.
+
+That realization is why this repository is framed as an execution-quality research lab rather than a trading bot showcase.
+
+## Why This Public Version Is Safe
+
+The original private prototype contained sensitive operational details, including public wallet addresses, on-chain order hashes, private data logs, probability-calibration parameters, and machine-learning configuration choices. Those details are not suitable for a public repository.
+
+This public version keeps only the research components that can be shared safely: anonymized tick records, reference-price data, simplified order records, public-safe model outputs, reports, notebooks, and dashboard artifacts. Identifiable private data and live execution details have been removed so the project can be used for learning, review, and discussion without exposing production trading operations.
+
 ## TL;DR
 
 | Question | Answer |
