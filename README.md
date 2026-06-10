@@ -46,14 +46,20 @@ $$
 $$
 
 $$
-P_{\text{fair, UP}} = \Phi\left(\operatorname{clip}(z, -z_{\max}, z_{\max})\right)
+z_{\text{clipped}}
+= \min\left(\max\left(z, -z_{\max}\right), z_{\max}\right)
+$$
+
+$$
+P_{\text{fair, UP}} = \Phi\left(z_{\text{clipped}}\right)
 $$
 
 $$
 P_{\text{fair, DOWN}} = 1 - P_{\text{fair, UP}}
 $$
 
-where \(P_t\) is the current BTC reference price, \(P_0\) is the opening-anchor price, \(\tau\) is remaining time to resolution, \(\sigma_s\) and \(\sigma_l\) are short- and long-window volatility estimates, and \(\Phi\) is the standard normal CDF.
+where \(P_t\) is the current BTC reference price, \(P_0\) is the opening-anchor price, \(\tau\) is remaining time to resolution, \(\sigma_s\) and \(\sigma_l\) are short- and long-window volatility estimates, \(z_{\mathrm{clipped}}\) caps extreme z-scores before probability conversion, and \(\Phi\) is the standard normal CDF.
+
 
 From there, the research question becomes execution-aware:
 
