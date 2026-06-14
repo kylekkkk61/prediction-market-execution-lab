@@ -123,7 +123,7 @@ This public version keeps only the research components that can be shared safely
 
 | Artifact | Description |
 |---|---|
-| [Portfolio Page](https://pm-lab.kylekkkk.com/) | Static public portfolio landing page for the project. |
+| [Portfolio Page](https://pm-lab.kylewu.me/) | Static public portfolio landing page for the project. |
 | [Live Dashboard](https://prediction-market-execution-lab-4byaayq2atzengbe26nkfb.streamlit.app/) | Streamlit dashboard for public-sample execution diagnostics. |
 | [`reports/execution_quality_report.md`](reports/execution_quality_report.md) | Signal funnel, rejection reasons, edge before/after execution, settlement PnL, author takeaways. |
 | [`reports/probability_calibration_report.md`](reports/probability_calibration_report.md) | Fair probability vs market-implied calibration, tail-bucket instability, Binance reference-price assumption. |

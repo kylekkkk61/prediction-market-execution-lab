@@ -29,13 +29,13 @@ reports/figures/*.png
 
 Use these settings when creating the app:
 
-| Setting | Value |
-|---|---|
-| Repository | `kylekkkk61/prediction-market-execution-lab` |
-| Branch | `main` |
-| Main file path | `dashboard/app.py` |
-| Python version | `3.11` if configurable |
-| Secrets | None |
+| Setting        | Value                                        |
+| -------------- | -------------------------------------------- |
+| Repository     | `kylekkkk61/prediction-market-execution-lab` |
+| Branch         | `main`                                       |
+| Main file path | `dashboard/app.py`                           |
+| Python version | `3.11` if configurable                       |
+| Secrets        | None                                         |
 
 The app should be deployed from the public repository only after private files remain excluded from Git.
 
@@ -74,7 +74,7 @@ The dashboard is a public-sample demonstration. It reads only tracked sample dat
 The verified static portfolio page is available at:
 
 ```text
-https://pm-lab.kylekkkk.com/
+https://pm-lab.kylewu.me/
 ```
 
 GitHub Pages fallback URL:
@@ -90,7 +90,7 @@ The portfolio page is a static landing page for the public research project. It 
 The project uses the custom domain for the static portfolio landing page:
 
 ```text
-https://pm-lab.kylekkkk.com/ → GitHub Pages static site
+https://pm-lab.kylewu.me/ → GitHub Pages static site
 ```
 
 The Streamlit dashboard remains hosted on Streamlit Community Cloud:
