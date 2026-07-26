@@ -5,6 +5,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 FIGURE_DIR = ROOT / "reports" / "figures"
+SITE_FIGURE_DIR = ROOT / "site" / "assets" / "figures"
 
 
 def test_generate_report_figures_creates_expected_pngs():
@@ -25,5 +26,15 @@ def test_generate_report_figures_creates_expected_pngs():
     }
     for filename in expected:
         path = FIGURE_DIR / filename
+        assert path.exists()
+        assert path.stat().st_size > 0
+
+    site_figures = {
+        "signal_funnel.png",
+        "execution_status_breakdown.png",
+        "calibration_curve.png",
+    }
+    for filename in site_figures:
+        path = SITE_FIGURE_DIR / filename
         assert path.exists()
         assert path.stat().st_size > 0

@@ -350,7 +350,7 @@ def render_markdown(summary: ExecutionQualitySummary) -> str:
         "",
         "## Execution funnel",
         "",
-        "The funnel shows how many candidate signals remain after they pass through attempted execution, acceptance, fill, rejection, and settlement-style sample states. This is the key place where theoretical edge can disappear before it becomes executable edge.",
+        "The funnel follows one execution-attempt sample through order submission, acceptance, and fill states. The dataset coverage counts above are independently sampled and should not be read as a shared cohort. This is the key place where theoretical edge can disappear before it becomes executable edge.",
         "",
         "![Signal funnel](figures/signal_funnel.png)",
         "",

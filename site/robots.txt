@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://pm-lab.kylewu.me/sitemap.xml

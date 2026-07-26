@@ -9,6 +9,7 @@ live-performance charts.
 from __future__ import annotations
 
 import csv
+import shutil
 from collections import Counter, defaultdict
 from pathlib import Path
 from statistics import mean
@@ -23,6 +24,37 @@ from risk.monte_carlo import bootstrap_paths, load_normalized_pnl
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data" / "sample"
 FIGURE_DIR = ROOT / "reports" / "figures"
+SITE_FIGURE_DIR = ROOT / "site" / "assets" / "figures"
+SITE_FIGURES = {
+    "signal_funnel.png",
+    "execution_status_breakdown.png",
+    "calibration_curve.png",
+}
+
+
+def _apply_plot_style() -> None:
+    """Apply the shared visual language used by reports and the project site."""
+    plt.rcParams.update(
+        {
+            "figure.facecolor": "#ffffff",
+            "axes.facecolor": "#ffffff",
+            "axes.edgecolor": "#c7c9d2",
+            "axes.labelcolor": "#4b5363",
+            "axes.grid": True,
+            "axes.grid.axis": "y",
+            "axes.spines.top": False,
+            "axes.spines.right": False,
+            "axes.prop_cycle": plt.cycler(color=["#3856d8", "#8091e8", "#6f7787"]),
+            "grid.color": "#e7e6e1",
+            "grid.linewidth": 0.8,
+            "grid.alpha": 0.9,
+            "text.color": "#141a28",
+            "xtick.color": "#626a79",
+            "ytick.color": "#626a79",
+            "font.family": "sans-serif",
+            "font.size": 9.5,
+        }
+    )
 
 
 def _read_csv(path: Path) -> list[dict[str, str]]:
@@ -46,9 +78,12 @@ def _save_current(name: str) -> Path:
     FIGURE_DIR.mkdir(parents=True, exist_ok=True)
     path = FIGURE_DIR / name
     fig = plt.gcf()
-    fig.tight_layout(rect=(0, 0, 1, 0.88))
-    fig.savefig(path, dpi=180, bbox_inches="tight", pad_inches=0.06)
+    fig.tight_layout(rect=(0.035, 0.045, 0.965, 0.82))
+    fig.savefig(path, dpi=180, bbox_inches="tight", pad_inches=0.16)
     plt.close(fig)
+    if name in SITE_FIGURES:
+        SITE_FIGURE_DIR.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(path, SITE_FIGURE_DIR / name)
     return path
 
 
@@ -77,22 +112,20 @@ def _apply_figure_heading(title: str, subtitle: str) -> None:
 
 
 def plot_signal_funnel() -> Path:
-    candidates = _read_csv(DATA_DIR / "candidates_sample.csv")
     executions = _read_csv(DATA_DIR / "executions_sample.csv")
-    settlements = _read_csv(DATA_DIR / "settlements_sample.csv")
     order_sent = sum(1 for row in executions if str(row.get("order_sent", "")).lower() == "true")
     accepted = sum(1 for row in executions if str(row.get("order_accepted", "")).lower() == "true")
     filled = sum(1 for row in executions if str(row.get("filled", "")).lower() == "true")
 
-    labels = ["Candidates", "Order sent", "Accepted", "Filled", "Settlements"]
-    values = [len(candidates), order_sent, accepted, filled, len(settlements)]
+    labels = ["Attempts", "Order sent", "Accepted", "Filled"]
+    values = [len(executions), order_sent, accepted, filled]
 
     plt.figure(figsize=(8, 4.5))
     plt.bar(labels, values)
-    plt.ylabel("Rows")
+    plt.ylabel("Execution attempts")
     _apply_figure_heading(
-        "Most candidate signals do not become filled exposure",
-        "Public sample counts across signal, order, fill, and settlement stages.",
+        "Most execution attempts do not become filled exposure",
+        "Public-sample attempts tracked through order, acceptance, and fill states.",
     )
     plt.xticks(rotation=20, ha="right")
     return _save_current("signal_funnel.png")
@@ -164,8 +197,20 @@ def plot_calibration_curve() -> Path:
     realized = [mean(outcome for _, outcome in grouped[label]) for label in labels]
 
     plt.figure(figsize=(6, 5))
-    plt.plot([0, 1], [0, 1], linestyle="--", label="Perfect calibration")
-    plt.plot(avg_forecasts, realized, marker="o", label="Fair probability")
+    plt.plot(
+        [0, 1],
+        [0, 1],
+        color="#7c8290",
+        linestyle="--",
+        label="Perfect calibration",
+    )
+    plt.plot(
+        avg_forecasts,
+        realized,
+        color="#3856d8",
+        marker="o",
+        label="Fair probability",
+    )
     plt.xlabel("Average forecast probability")
     plt.ylabel("Realized UP rate")
     _apply_figure_heading(
@@ -239,7 +284,7 @@ def plot_system_architecture() -> Path:
         ("Dashboard &\nrisk", "interactive\nreview"),
     ]
 
-    fig, ax = plt.subplots(figsize=(15.5, 4.6))
+    fig, ax = plt.subplots(figsize=(15.5, 4.6), facecolor="#f5f3ed")
     fig.subplots_adjust(left=0.025, right=0.975, top=0.82, bottom=0.08)
     ax.axis("off")
     fig.suptitle(
@@ -273,8 +318,8 @@ def plot_system_architecture() -> Path:
             box_height,
             boxstyle="round,pad=0.018,rounding_size=0.018",
             linewidth=1.25,
-            facecolor="white",
-            edgecolor="black",
+            facecolor="#fbfaf7",
+            edgecolor="#3856d8",
             transform=ax.transAxes,
         )
         ax.add_patch(box)
@@ -305,7 +350,7 @@ def plot_system_architecture() -> Path:
                 xy=(x + box_width + gap * 0.74, y + box_height / 2),
                 xytext=(x + box_width + gap * 0.18, y + box_height / 2),
                 xycoords=ax.transAxes,
-                arrowprops={"arrowstyle": "->", "lw": 1.2},
+                arrowprops={"arrowstyle": "->", "color": "#7c8290", "lw": 1.2},
             )
 
     fig.savefig(path, dpi=180)
@@ -314,6 +359,7 @@ def plot_system_architecture() -> Path:
 
 
 def main() -> None:
+    _apply_plot_style()
     figures = [
         plot_system_architecture(),
         plot_signal_funnel(),
