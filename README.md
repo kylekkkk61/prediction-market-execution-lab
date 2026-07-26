@@ -123,7 +123,8 @@ This public version keeps only the research components that can be shared safely
 
 | Artifact | Description |
 |---|---|
-| [Portfolio Page](https://pm-lab.kylewu.me/) | Static public portfolio landing page for the project. |
+| [Project Site](https://pm-lab.kylewu.me/) | Static public research overview for the project. |
+| [Portfolio Case Study](https://kylewu.me/projects/prediction-market-execution-lab) | Project context, design decisions, and outcomes. |
 | [Live Dashboard](https://prediction-market-execution-lab-4byaayq2atzengbe26nkfb.streamlit.app/) | Streamlit dashboard for public-sample execution diagnostics. |
 | [`reports/execution_quality_report.md`](reports/execution_quality_report.md) | Signal funnel, rejection reasons, edge before/after execution, settlement PnL, author takeaways. |
 | [`reports/probability_calibration_report.md`](reports/probability_calibration_report.md) | Fair probability vs market-implied calibration, tail-bucket instability, Binance reference-price assumption. |
@@ -146,7 +147,7 @@ This public version keeps only the research components that can be shared safely
   <tr>
     <td align="center">
       <img src="reports/figures/signal_funnel.png" alt="Signal funnel" width="360"><br>
-      <em>Most candidate signals do not become filled exposure.</em>
+      <em>Most public-sample execution attempts do not become filled exposure.</em>
     </td>
     <td align="center">
       <img src="reports/figures/execution_status_breakdown.png" alt="Execution status breakdown" width="360"><br>
